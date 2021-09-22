@@ -5,6 +5,8 @@ import inquirer from 'inquirer';
 import figlet from 'figlet';
 import ora from 'ora';
 
+import * as mongodbHelper from './helpers/mongodb.js';
+
 figlet('Adminmate', function(err, data) {
   console.log(data)
 
@@ -38,28 +40,33 @@ const commandLine = () => {
   commander
     .usage('[options] <file>')
     .option('--database <database>', 'use database')
-    .action((params, options) => {
+    .action(async (params, options) => {
       console.log(params);
       console.log('');
 
-      inquirer.prompt(databaseQuestions)
-        .then(result => {
-          console.log(JSON.stringify(result))
+      const databaseData = await inquirer.prompt(databaseQuestions)
+      console.log(JSON.stringify(databaseData))
 
-          const spinner = ora('Connecting to the database...').start();
+      console.log('');
 
-          setTimeout(() => {
-            // spinner.stop();
-            spinner.succeed('Database connection succeed');
+      const spinner = ora('Connecting to the database...').start();
 
-            inquirer.prompt(projectQuestions)
-              .then(result => {
-                console.log(JSON.stringify(result))
-              });
+      setTimeout(() => {
+        mongodbHelper.getDatabaseSchema('localhost', 27017, '', '', 'node-express-mongodb-server', false, false, schemas => {
+          spinner.succeed('Database connection succeed');
+        });
+      }, 2000);
 
-          }, 2000);
+      // setTimeout(async () => {
+      //   // spinner.stop();
+      //   spinner.succeed('Database connection succeed');
 
-        })
+      //   console.log('');
+
+      //   const projectData = await inquirer.prompt(projectQuestions)
+      //   console.log(JSON.stringify(projectData))
+
+      // }, 2000);
     })
     .parse(process.argv);
-}
+};
