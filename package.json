@@ -1,0 +1,21 @@
+{
+  "name": "adminmate-cli",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "exports": "./index.js",
+  "bin": {
+    "jsonp": "index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Marc Delalonde",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "commander": "^8.2.0",
+    "figlet": "^1.5.2",
+    "inquirer": "^8.1.5",
+    "ora": "^6.0.1"
+  }
+}
