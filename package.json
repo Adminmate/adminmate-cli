@@ -1,7 +1,7 @@
 {
   "name": "adminmate-cli",
   "version": "1.0.0",
-  "description": "🧑‍💻 Adminmate installation CLI",
+  "description": "Adminmate installation CLI",
   "type": "module",
   "exports": "./index.js",
   "bin": {
@@ -15,7 +15,9 @@
   "dependencies": {
     "commander": "^8.2.0",
     "figlet": "^1.5.2",
+    "handlebars": "^4.7.7",
     "inquirer": "^8.1.5",
+    "mkdirp": "^1.0.4",
     "mongodb": "^4.1.2",
     "mongodb-schema": "^9.0.0",
     "ora": "^6.0.1"

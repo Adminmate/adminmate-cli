@@ -5,13 +5,16 @@ import inquirer from 'inquirer';
 import figlet from 'figlet';
 import ora from 'ora';
 
+import * as templateGenerator from './helpers/generator.js';
 import * as mongodbHelper from './helpers/mongodb.js';
 
 figlet('Adminmate', function(err, data) {
-  console.log(data)
+  console.log(data);
+
+  templateGenerator.createAdminTemplate('generated', 'mongodb');
 
   // Launch command line program
-  commandLine();
+  // commandLine();
 });
 
 const databaseQuestions = [
@@ -54,6 +57,8 @@ const commandLine = () => {
       setTimeout(() => {
         mongodbHelper.getDatabaseSchema('localhost', 27017, '', '', 'node-express-mongodb-server', false, false, schemas => {
           spinner.succeed('Database connection succeed');
+
+          // templateGenerator.createAdminTemplate('generated', 'mongodb');
         });
       }, 2000);
 
