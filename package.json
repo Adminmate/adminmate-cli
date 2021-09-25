@@ -17,6 +17,7 @@
     "figlet": "^1.5.2",
     "handlebars": "^4.7.7",
     "inquirer": "^8.1.5",
+    "lodash": "^4.17.21",
     "mkdirp": "^1.0.4",
     "mongodb": "^4.1.2",
     "mongodb-schema": "^9.0.0",
