@@ -11,10 +11,8 @@ import * as mongodbHelper from './helpers/mongodb.js';
 figlet('Adminmate', function(err, data) {
   console.log(data);
 
-  templateGenerator.createAdminTemplate('generated', 'mongodb');
-
   // Launch command line program
-  // commandLine();
+  commandLine();
 });
 
 const databaseQuestions = [
@@ -24,11 +22,11 @@ const databaseQuestions = [
     message: 'What kind of database you want to use ?',
     choices: ['mysql', 'postgresql', 'sqlite', 'mongodb']
   },
-  {
-    name: 'uri',
-    type: 'input',
-    message: 'What the connection uri of your database ? (ex: mongodb://username:password@host:port/database)'
-  }
+  // {
+  //   name: 'uri',
+  //   type: 'input',
+  //   message: 'What the connection uri of your database ? (ex: mongodb://username:password@host:port/database)'
+  // }
 ];
 
 const projectQuestions = [
@@ -44,34 +42,33 @@ const commandLine = () => {
     .usage('[options] <file>')
     .option('--database <database>', 'use database')
     .action(async (params, options) => {
-      console.log(params);
+      // console.log(params);
       console.log('');
 
       const databaseData = await inquirer.prompt(databaseQuestions)
-      console.log(JSON.stringify(databaseData))
+      // console.log(JSON.stringify(databaseData))
 
       console.log('');
 
-      const spinner = ora('Connecting to the database...').start();
+      console.log('Installation steps:')
+      const spinner = ora('1 - Connecting to the database').start();
 
       setTimeout(() => {
         mongodbHelper.getDatabaseSchema('localhost', 27017, '', '', 'node-express-mongodb-server', false, false, schemas => {
-          spinner.succeed('Database connection succeed');
+          spinner.succeed();
 
-          // templateGenerator.createAdminTemplate('generated', 'mongodb');
+          const spinner2 = ora('2 - Generating project files').start();
+          setTimeout(() => {
+            spinner2.succeed();
+            console.log('');
+            ora('Your project is ready!').succeed();
+            ora('You can now start your server with the following command: "npm run dev"').info();
+            console.log('');
+          }, 2000);
+
+          templateGenerator.createAdminTemplate('generated', 'mongodb', schemas);
         });
       }, 2000);
-
-      // setTimeout(async () => {
-      //   // spinner.stop();
-      //   spinner.succeed('Database connection succeed');
-
-      //   console.log('');
-
-      //   const projectData = await inquirer.prompt(projectQuestions)
-      //   console.log(JSON.stringify(projectData))
-
-      // }, 2000);
     })
     .parse(process.argv);
 };

@@ -1,11 +1,15 @@
 'use strict';
 
 const express = require('express');
+{{#ifEquals database 'mongodb' }}
+const Adminmate = require('adminmate-express-mongoose');
+{{else}}
 const Adminmate = require('adminmate-express-sequelize');
+{{/ifEquals}}
 
 // Environment vars
 const env = process.env.NODE_ENV || 'development';
-const port = process.env.PORT || 3020;
+const port = process.env.PORT || 3010;
 
 const app = express();
 

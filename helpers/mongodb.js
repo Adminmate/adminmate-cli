@@ -13,17 +13,17 @@ export function getDatabaseSchema(host, port = 27017, user, password, dbName, sr
     const collections = await db.listCollections().toArray();
     for (const collection of collections) {
 
-      if (collection.name === 'projects') {
-        const collectionData = await db.collection(collection.name).find().limit(50).toArray();
-        const cleanSchema = dataAnalyser.analyse(collectionData);
+      // if (collection.name === 'projects') {
+      const collectionData = await db.collection(collection.name).find().limit(50).toArray();
+      const cleanSchema = dataAnalyser.analyse(collectionData);
 
-        console.log('====', collectionData);
+      // console.log('====', collectionData);
 
-        cleanSchemas.push({
-          collection: collection.name,
-          schema: cleanSchema
-        });
-      }
+      cleanSchemas.push({
+        collection: collection.name,
+        schema: cleanSchema
+      });
+      // }
     }
 
     client.close();

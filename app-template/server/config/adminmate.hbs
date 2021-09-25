@@ -1,0 +1,27 @@
+// Get database instance
+const db = require('../database');
+
+module.exports = {
+
+  // Test
+  projectId: '',
+  secretKey: '',
+  authKey: '',
+  masterPassword: '',
+
+  models: [
+    {{#each models as |model|}}
+    {
+      slug: '{{model.collection}}',
+      model: db.{{model.collection}},
+      actions: [],
+      options: {
+        canUpdate: true,
+        canDelete: true
+      }
+    },
+    {{/each}}
+  ],
+
+  authorizedIps: []
+};

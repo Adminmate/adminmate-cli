@@ -6,8 +6,6 @@ import handlebars from './handlebars.js';
 
 export async function createAdminTemplate(projectName, database, models) {
   await createTemplateStructure(projectName, database, models);
-
-  console.log('ok!!!!!!!!!!!!');
 };
 
 const createTemplateStructure = (projectName, database, models) => {
@@ -29,19 +27,34 @@ const createTemplateStructure = (projectName, database, models) => {
     createPackageJsonFile(projectName, projectPath);
 
     models.forEach(model => {
-      createModelFile(projectPath, model);
+      createModelFile(projectPath, database, model);
     });
+
+    createAmConfigFile(projectPath, database, models);
 
     resolve();
   });
 };
 
-const createModelFile = (projectPath, model) => {
+const createAmConfigFile = (projectPath, database, models) => {
+  const cwd = process.cwd();
+  const tplContent = fs.readFileSync(`${cwd}/app-template/server/config/adminmate.hbs`, 'utf8');
+  const compiledTplContent = handlebars.compile(tplContent);
+  const result = compiledTplContent({ models });
+
+  createFile(`${projectPath}/server/config/adminmate.js`, result);
+};
+
+const createModelFile = (projectPath, database, model) => {
   const cwd = process.cwd();
 
-  const serverJsContent = fs.readFileSync(`${cwd}/app-template/server/models/schema-mongoose.hbs`, 'utf8');
-  const serverJsTemplate = handlebars.compile(serverJsContent);
-  const result = serverJsTemplate({
+  const databaseTemplates = {
+    'mongodb': 'mongoose'
+  };
+
+  const tplContent = fs.readFileSync(`${cwd}/app-template/server/models/schema-${databaseTemplates[database]}.hbs`, 'utf8');
+  const compiledTplContent = handlebars.compile(tplContent);
+  const result = compiledTplContent({
     modelName: model.collection,
     jsonSchema: model.schema
   });
@@ -56,32 +69,20 @@ const createPackageJsonFile = (projectName, projectPath) => {
 {
   "name": "${projectSlug}-adminmate-mongodb",
   "version": "1.0.0",
-  "private": false,
+  "private": true,
   "scripts": {
-    "start": "node ./server.js",
+    "start": "node ./server.js"
   },
   "dependencies": {
-    "@hapi/joi": "^17.1.1",
     "adminmate-express-mongoose": "^1.1.11",
     "axios": "^0.18.0",
-    "bcrypt": "^4.0.1",
-    "browser-sync": "^2.26.5",
     "cookie-parser": "^1.4.4",
     "cors": "^2.8.5",
     "express": "^4.16.4",
-    "faker": "^5.4.0",
-    "formidable": "1.1.x",
-    "gulp-nodemon": "^2.4.2",
     "lodash": "^4.17.11",
     "moment": "^2.24.0",
-    "moment-timezone": "^0.5.27",
     "mongoose": "^5.9.7",
-    "natives": "^1.1.6",
-    "promise": "^8.0.3",
-    "sitemap": "^5.1.0",
-    "slack-notify": "^0.1.7",
-    "slugify": "^1.4.5",
-    "uuid": "3.3.x"
+    "promise": "^8.0.3"
   }
 }`;
 
