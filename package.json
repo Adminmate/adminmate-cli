@@ -19,6 +19,7 @@
     "inquirer": "^8.1.5",
     "lodash": "^4.17.21",
     "mkdirp": "^1.0.4",
+    "moment": "^2.29.1",
     "mongodb": "^4.1.2",
     "mongodb-schema": "^9.0.0",
     "ora": "^6.0.1",

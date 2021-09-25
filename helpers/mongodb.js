@@ -1,5 +1,5 @@
-import parseSchema from 'mongodb-schema'
 import { MongoClient } from 'mongodb';
+import * as dataAnalyser from './dataAnalyser.js';
 
 export function getDatabaseSchema(host, port = 27017, user, password, dbName, srv = false, ssl = false, cb) {
   const uri = `mongodb${srv?'+srv':''}://${user}${user?':':''}${password}${user?'@':''}${host}${!srv?`:${port}`:''}/${dbName}`;
@@ -13,22 +13,17 @@ export function getDatabaseSchema(host, port = 27017, user, password, dbName, sr
     const collections = await db.listCollections().toArray();
     for (const collection of collections) {
 
-      const collectionSchema = await parseSchema(db.collection(collection.name).find(), { storeValues: false });
-      //if (err) return console.error(err);
+      if (collection.name === 'projects') {
+        const collectionData = await db.collection(collection.name).find().limit(50).toArray();
+        const cleanSchema = dataAnalyser.analyse(collectionData);
 
-      const cleanSchema = getFieldsConf(
-        collectionSchema.fields.filter(fieldConf => fieldConf.name !== '__v')
-      );
+        console.log('====', collectionData);
 
-      // if (collection.name !== 'project_members') {
-      // console.log('====collectionSchema', JSON.stringify(collectionSchema, null, 2));
-      console.log('===cleanSchema', collection.name, JSON.stringify(cleanSchema, null, 2));
-      // }
-
-      cleanSchemas.push({
-        collection: collection.name,
-        schema: collectionSchema
-      });
+        cleanSchemas.push({
+          collection: collection.name,
+          schema: cleanSchema
+        });
+      }
     }
 
     client.close();

@@ -4,19 +4,19 @@ import slugify from 'slugify';
 
 import handlebars from './handlebars.js';
 
-export async function createAdminTemplate(projectName, database) {
-  await createTemplateStructure(projectName);
+export async function createAdminTemplate(projectName, database, models) {
+  await createTemplateStructure(projectName, database, models);
 
   console.log('ok!!!!!!!!!!!!');
 };
 
-const createTemplateStructure = (projectName) => {
+const createTemplateStructure = (projectName, database, models) => {
   return new Promise(async (resolve, reject) => {
     const cwd = process.cwd();
     const projectPath = `${cwd}/${projectName}`;
 
     // Remove generated dir - for dev only
-    // fs.rmdirSync(`${projectPath}`, { recursive: true });
+    fs.rmdirSync(`${projectPath}`, { recursive: true });
 
     await mkdirp(`${projectPath}/server`);
     await mkdirp(`${projectPath}/server/config`);
@@ -24,14 +24,29 @@ const createTemplateStructure = (projectName) => {
     await mkdirp(`${projectPath}/server/middlewares`);
     await mkdirp(`${projectPath}/server/models`);
 
-    // createFile(`${projectPath}/package.json`, 'test');
-
     createServerJsFile(projectPath);
     createDatabaseFile(projectPath);
     createPackageJsonFile(projectName, projectPath);
 
+    models.forEach(model => {
+      createModelFile(projectPath, model);
+    });
+
     resolve();
   });
+};
+
+const createModelFile = (projectPath, model) => {
+  const cwd = process.cwd();
+
+  const serverJsContent = fs.readFileSync(`${cwd}/app-template/server/models/schema-mongoose.hbs`, 'utf8');
+  const serverJsTemplate = handlebars.compile(serverJsContent);
+  const result = serverJsTemplate({
+    modelName: model.collection,
+    jsonSchema: model.schema
+  });
+
+  createFile(`${projectPath}/server/models/${model.collection}.js`, result);
 };
 
 const createPackageJsonFile = (projectName, projectPath) => {

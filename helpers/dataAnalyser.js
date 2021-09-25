@@ -1,23 +1,52 @@
 import _ from 'lodash';
+import moment from 'moment';
 
 let dataStructure = {};
 let finalDataStructure = {};
 
 export function analyse(dataSet) {
-  // (Array.isArray(dataSet) ? dataSet : [dataSet]).forEach((data, i) => iterate(data, i+1))
-  iterate(dataSet);
+  dataStructure = {};
+  finalDataStructure = {};
 
-  const dataSetLength = (Array.isArray(dataSet) ? dataSet.length : 1);
-  cleanDataStructure(dataStructure, '', dataSetLength);
+  if (!Array.isArray(dataSet)) {
+    return 'Should be an array';
+  }
+
+  const cleanDataSet = dataSet.map(dataItem => JSON.parse(JSON.stringify(dataItem)));
+
+  // (Array.isArray(dataSet) ? dataSet : [dataSet]).forEach((data, i) => iterate(data, i+1))
+  iterate(cleanDataSet);
+
+  // const dataSetLength = (Array.isArray(dataSet) ? dataSet.length : 1);
+  cleanDataStructure(dataStructure, '', cleanDataSet.length);
 
   return finalDataStructure;
 }
 
-const getDataType = (data) => {
+const getDataType = data => {
+  if (data === null) {
+    return 'string';
+  }
+  else if (typeof data === 'string') {
+    // Check if it is a valid mongodb id
+    const checkForHexRegExp = new RegExp('^[0-9a-fA-F]{24}$');
+    if (checkForHexRegExp.test(data)) {
+      return 'objectid';
+    }
+    // Check if it is a valid date
+    if (data.length === 24 && moment(data).isValid()) {
+      return 'date';
+    }
+  }
+
   return typeof data;
 };
 
-const setElementProperties = (path, value, iteration) => {
+const setElementProperties = (path, value) => {
+  if (path === '_id' || path === '__v' || path.endsWith('._id')) {
+    return;
+  }
+
   const currentProperties = _.get(dataStructure, path);
 
   let elementProperties = {};
@@ -35,20 +64,19 @@ const setElementProperties = (path, value, iteration) => {
   _.set(dataStructure, path, elementProperties);
 };
 
-const iterate = (obj, cursor = '', iteration = 0) => {
+const iterate = (obj, cursor = '') => {
   const isArray = Array.isArray(obj);
-  iteration = isArray ? 0 : iteration;
+
   Object.keys(obj).forEach(key => {
-    iteration += isArray ? 1 : 0;
     const realKey = isArray ? 0 : key;
     const path = cursor ? `${cursor}.${realKey}` : realKey;
 
-    if (typeof obj[key] === 'object') {
-      iterate(obj[key], path, iteration);
+    if (obj[key] && typeof obj[key] === 'object') {
+      iterate(obj[key], path);
     }
     else {
-      console.log(`path: ${path}, key: ${key}, value: ${obj[key]}, iteration: ${iteration}`);
-      setElementProperties(path, obj[key], iteration);
+      // console.log(`path: ${path}, key: ${key}, value: ${obj[key]}`);
+      setElementProperties(path, obj[key]);
     }
   });
 };
@@ -59,16 +87,19 @@ const cleanDataStructure = (obj, cursor = '', dataSetLength) => {
     const realKey = isArray ? 0 : key;
     const path = cursor ? `${cursor}.${realKey}` : realKey;
 
-    if (typeof obj[key] === 'object' && typeof obj[key].type === 'undefined') {
+    if (obj[key] && typeof obj[key] === 'object' && typeof obj[key].type === 'undefined') {
       cleanDataStructure(obj[key], path, dataSetLength);
     }
     else {
       const currentProperties = _.get(dataStructure, path);
-      const newProperties = {
-        ...currentProperties,
-        required: currentProperties.count === dataSetLength
-      };
+      const newProperties = { ...currentProperties };
+
+      // Add the required property if needed
+      if (currentProperties.count === dataSetLength) {
+        newProperties.required = true;
+      }
       delete newProperties.count;
+
       _.set(finalDataStructure, path, newProperties);
     }
   });
