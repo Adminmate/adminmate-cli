@@ -1,27 +1,26 @@
 import _ from 'lodash';
 import moment from 'moment';
 
-let dataStructure = {};
-let finalDataStructure = {};
+let _dataStructure = {};
+let _finalDataStructure = {};
 
 export function analyse(dataSet) {
-  dataStructure = {};
-  finalDataStructure = {};
-
   if (!Array.isArray(dataSet)) {
     return 'Should be an array';
   }
 
   const cleanDataSet = dataSet.map(dataItem => JSON.parse(JSON.stringify(dataItem)));
 
-  // (Array.isArray(dataSet) ? dataSet : [dataSet]).forEach((data, i) => iterate(data, i+1))
-  iterate(cleanDataSet);
+  // Explore the dataset structure
+  const dataSetStructure = iterate(cleanDataSet);
 
-  // const dataSetLength = (Array.isArray(dataSet) ? dataSet.length : 1);
-  cleanDataStructure(dataStructure, '', cleanDataSet.length);
+  // Clean the dataset structure
+  const cleanDataSetStructure = cleanDataStructure(dataSetStructure, cleanDataSet.length);
 
-  return finalDataStructure;
+  return cleanDataSetStructure;
 }
+
+// Data analyser ------------------------------------------------------------------------
 
 const getDataType = data => {
   if (data === null) {
@@ -47,7 +46,7 @@ const setElementProperties = (path, value) => {
     return;
   }
 
-  const currentProperties = _.get(dataStructure, path);
+  const currentProperties = _.get(_dataStructure, path);
 
   let elementProperties = {};
   if (!currentProperties) {
@@ -61,10 +60,16 @@ const setElementProperties = (path, value) => {
     elementProperties.count += 1;
   }
 
-  _.set(dataStructure, path, elementProperties);
+  _.set(_dataStructure, path, elementProperties);
 };
 
-const iterate = (obj, cursor = '') => {
+const iterate = dataSet => {
+  _dataStructure = {};
+  iterateRecursive(dataSet);
+  return _dataStructure;
+};
+
+const iterateRecursive = (obj, cursor = '') => {
   const isArray = Array.isArray(obj);
 
   Object.keys(obj).forEach(key => {
@@ -72,7 +77,7 @@ const iterate = (obj, cursor = '') => {
     const path = cursor ? `${cursor}.${realKey}` : realKey;
 
     if (obj[key] && typeof obj[key] === 'object') {
-      iterate(obj[key], path);
+      iterateRecursive(obj[key], path);
     }
     else {
       // console.log(`path: ${path}, key: ${key}, value: ${obj[key]}`);
@@ -81,17 +86,23 @@ const iterate = (obj, cursor = '') => {
   });
 };
 
-const cleanDataStructure = (obj, cursor = '', dataSetLength) => {
-  const isArray = Array.isArray(obj);
+// Data structure cleaning --------------------------------------------------------------
+
+const cleanDataStructure = (dataSetStructure, totalCount) => {
+  _finalDataStructure = {};
+  cleanDataStructureRecursive(dataSetStructure, '', totalCount);
+  return _finalDataStructure;
+};
+
+const cleanDataStructureRecursive = (obj, cursor = '', dataSetLength) => {
   Object.keys(obj).forEach(key => {
-    const realKey = isArray ? 0 : key;
-    const path = cursor ? `${cursor}.${realKey}` : realKey;
+    const path = cursor ? `${cursor}.${key}` : key;
 
     if (obj[key] && typeof obj[key] === 'object' && typeof obj[key].type === 'undefined') {
-      cleanDataStructure(obj[key], path, dataSetLength);
+      cleanDataStructureRecursive(obj[key], path, dataSetLength);
     }
     else {
-      const currentProperties = _.get(dataStructure, path);
+      const currentProperties = _.get(_dataStructure, path);
       const newProperties = { ...currentProperties };
 
       // Add the required property if needed
@@ -100,7 +111,7 @@ const cleanDataStructure = (obj, cursor = '', dataSetLength) => {
       }
       delete newProperties.count;
 
-      _.set(finalDataStructure, path, newProperties);
+      _.set(_finalDataStructure, path, newProperties);
     }
   });
 };
