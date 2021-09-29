@@ -1,5 +1,5 @@
-'use strict';
-
+// Import all env vars from .env file
+require('dotenv').config();
 const express = require('express');
 {{#ifEquals database 'mongodb' }}
 const Adminmate = require('adminmate-express-mongoose');
@@ -15,7 +15,6 @@ const app = express();
 
 // Global vars
 global.NODE_ENV = env;
-global.AM_DEV_MODE = !!process.env.npm_config_devmode;
 
 // Set up jade
 app.set('port', port);
@@ -29,14 +28,14 @@ app.use(express.urlencoded({
 const { connectDb } = require('./server/database');
 connectDb().then(async () => {
   console.log('Adminmate Admin has started');
-  console.log(`Dev Mode: ${global.AM_DEV_MODE}`);
+  console.log(`Env: ${global.NODE_ENV}`);
 });
 {{else}}
 // Connect to database
 const db = require('./server/database');
 db.sequelize.sync().then(() => {
   console.log('Adminmate Admin has started');
-  console.log(`Dev Mode: ${global.AM_DEV_MODE}`);
+  console.log(`Env: ${global.NODE_ENV}`);
 });
 {{/ifEquals}}
 

@@ -7,7 +7,7 @@ import ora from 'ora';
 import axios from 'axios';
 
 import * as templateGenerator from './helpers/generator.js';
-import * as mongodbHelper from './helpers/mongodb.js';
+import * as dbHelper from './helpers/database.js';
 import * as generalHelper from './helpers/general.js';
 
 figlet('Adminmate', function(err, data) {
@@ -160,7 +160,7 @@ const commandLine = () => {
 
       // Connect to the database --------------------------------------------------------
 
-      const schemas = await mongodbHelper.getDatabaseSchemas('localhost', 27017, '', '', 'node-express-mongodb-server', false, false)
+      const schemas = await dbHelper.getDatabaseSchemas(params.db, databaseCredentials)//'localhost', 27017, '', '', 'node-express-mongodb-server', false, false)
         .catch(err => {
           spinner.fail(`Fail to connect to the database: ${err}`);
         });
@@ -174,7 +174,7 @@ const commandLine = () => {
       const generationSpinner = ora('Generating the project structure...').start();
 
       await generalHelper.timeout(2000);
-      templateGenerator.createAdminTemplate('generated', 'mongodb', schemas);
+      templateGenerator.createAdminTemplate('generated', params.db, schemas, params, databaseCredentials);
 
       generationSpinner.succeed();
 

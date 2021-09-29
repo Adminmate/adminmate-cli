@@ -2,11 +2,26 @@ import { MongoClient } from 'mongodb';
 import * as dataAnalyser from './dataAnalyser.js';
 import * as generalHelper from './general.js';
 
-export function getDatabaseSchemas(host, port = 27017, user, password, dbName, srv = false, ssl = false, cb) {
+export function getDatabaseSchemas(database, params) {
+  if (database === 'mongodb') {
+    return getMongodbSchemas(params);
+  }
+  return Promise.reject('This database is not available for the moment');
+};
+
+const getMongodbSchemas = params => {
   return new Promise(async (resolve, reject) => {
+
+    if (!params.host) { return reject('host parameter is undefined'); }
+    if (!params.name) { return reject('host parameter is undefined'); }
+
     await generalHelper.timeout(2000);
 
-    const uri = `mongodb${srv?'+srv':''}://${user}${user?':':''}${password}${user?'@':''}${host}${!srv?`:${port}`:''}/${dbName}${ssl?'?ssl=true':''}`;
+    const protocol = `mongodb${params.srv ? '+srv' : ''}`;
+    const cred = `${params.user}${params.user ? ':' : ''}${params.password}`;
+    const host = `${params.host}${!params.srv ? `:${params.port}` : ''}`;
+    const dbAndParams = `${params.name}${params.ssl?'?ssl=true':''}`;
+    const uri = `${protocol}://${cred}${cred ? '@' : ''}${host}/${dbAndParams}`;
 
     const client = await MongoClient.connect(uri, { useNewUrlParser: true })
       .catch(err => {
@@ -18,7 +33,8 @@ export function getDatabaseSchemas(host, port = 27017, user, password, dbName, s
       return;
     }
 
-    const db = client.db(dbName);
+    // Connect to the proper db
+    const db = client.db(params.name);
 
     const cleanSchemas = [];
 
@@ -28,7 +44,6 @@ export function getDatabaseSchemas(host, port = 27017, user, password, dbName, s
       // if (collection.name === 'projects') {
       const collectionData = await db.collection(collection.name).find().limit(50).toArray();
       const cleanSchema = dataAnalyser.analyse(collectionData);
-
       // console.log('====', collectionData);
 
       cleanSchemas.push({

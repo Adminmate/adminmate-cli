@@ -3,12 +3,13 @@ import mkdirp from 'mkdirp';
 import slugify from 'slugify';
 
 import handlebars from './handlebars.js';
+import * as generalHelper from './general.js';
 
-export async function createAdminTemplate(projectName, database, models) {
-  await createTemplateStructure(projectName, database, models);
+export async function createAdminTemplate(projectName, database, models, generalParams, dbParams) {
+  await createTemplateStructure(projectName, database, models, generalParams, dbParams);
 };
 
-const createTemplateStructure = (projectName, database, models) => {
+const createTemplateStructure = (projectName, database, models, generalParams, dbParams) => {
   return new Promise(async (resolve, reject) => {
     const cwd = process.cwd();
     const projectPath = `${cwd}/${projectName}`;
@@ -25,6 +26,8 @@ const createTemplateStructure = (projectName, database, models) => {
     createServerJsFile(projectPath);
     createDatabaseFile(projectPath);
     createPackageJsonFile(projectName, projectPath);
+    createDotEnvFile(projectPath, generalParams, dbParams);
+    createGitIgnoreFile(projectPath);
 
     models.forEach(model => {
       createModelFile(projectPath, database, model);
@@ -34,6 +37,27 @@ const createTemplateStructure = (projectName, database, models) => {
 
     resolve();
   });
+};
+
+const createDotEnvFile = (projectPath, generalParams, dbParams) => {
+  const fileContent = `// IMPORTANT: This file should be removed from production env
+
+AM_PROJECT_ID=${generalParams.id}
+AM_SECRET_KEY=${generalParams.sk}
+AM_AUTH_KEY=${generalHelper.randomString(64)}
+AM_MASTER_PWD=
+`;
+
+  createFile(`${projectPath}/.env`, fileContent);
+};
+
+const createGitIgnoreFile = (projectPath) => {
+  const fileContent = `node_modules
+.env
+.DS_Store
+`;
+
+  createFile(`${projectPath}/.gitignore`, fileContent);
 };
 
 const createAmConfigFile = (projectPath, database, models) => {
@@ -78,6 +102,7 @@ const createPackageJsonFile = (projectName, projectPath) => {
     "axios": "^0.18.0",
     "cookie-parser": "^1.4.4",
     "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
     "express": "^4.16.4",
     "lodash": "^4.17.11",
     "moment": "^2.24.0",
