@@ -2,7 +2,7 @@ import { MongoClient } from 'mongodb';
 import * as dataAnalyser from './dataAnalyser.js';
 
 export function getDatabaseSchema(host, port = 27017, user, password, dbName, srv = false, ssl = false, cb) {
-  const uri = `mongodb${srv?'+srv':''}://${user}${user?':':''}${password}${user?'@':''}${host}${!srv?`:${port}`:''}/${dbName}`;
+  const uri = `mongodb${srv?'+srv':''}://${user}${user?':':''}${password}${user?'@':''}${host}${!srv?`:${port}`:''}/${dbName}${ssl?'?ssl=true':''}`;
   MongoClient.connect(uri, { useNewUrlParser: true }, async function(err, client) {
     if (err) return console.error(err);
 

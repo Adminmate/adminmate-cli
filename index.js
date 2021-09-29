@@ -56,16 +56,68 @@ const checkReqValidity = params => {
       });
     }, 2000);
   });
-}
+};
+
+const mongodbQuestions = [
+  {
+    name: 'host',
+    type: 'input',
+    message: 'Type your database hostname',
+    default: 'localhost'
+  },
+  {
+    name: 'port',
+    type: 'number',
+    message: 'Type your database port',
+    default: 27017
+  },
+  {
+    name: 'user',
+    type: 'input',
+    message: 'Type your database username'
+  },
+  {
+    name: 'password',
+    type: 'password',
+    mask: true,
+    message: 'Type your database password'
+  },
+  {
+    name: 'name',
+    type: 'input',
+    message: 'Type your database name'
+  },
+  {
+    name: 'srv',
+    type: 'confirm',
+    default: false,
+    message: 'Do you use a SRV connection ?'
+  }
+];
+
+const getDatabaseCredentialsQuestions = db => {
+  switch (db) {
+    case 'mongodb':
+      return mongodbQuestions;
+    case 'mysql':
+    case 'postgresql':
+    case 'sqlite':
+      return [{
+        name: 'host',
+        type: 'input',
+        message: 'sql host'
+      }];
+  }
+};
 
 const commandLine = () => {
   commander
     .usage('[options] <file>')
-    .requiredOption('--project <project>', 'use project')
-    .requiredOption('--pid <pid>', 'use project id')
+    .requiredOption('--name <name>', 'use project name')
+    .requiredOption('--id <id>', 'use project id')
     .requiredOption('--sk <sk>', 'use secret key')
     .requiredOption('--hash <hash>', 'use hash')
-    .option('--database <database>', 'use database')
+    .option('--db <database>', 'use database')
     .action(async (params, options) => {
       // console.log(params);
 
@@ -77,34 +129,37 @@ const commandLine = () => {
         return;
       }
       spinnerReqValidity.succeed('');
-      console.log('');
 
       const databaseQuestions = [];
-      if (!params.database || !['mysql', 'postgresql', 'sqlite', 'mongodb'].includes(params.database)) {
+      if (!params.db || !['mysql', 'postgresql', 'sqlite', 'mongodb'].includes(params.db)) {
         databaseQuestions.push(databaseQuestion);
       }
 
       // If there is missing info
       if (databaseQuestions.length) {
-        const databaseData = await inquirer.prompt(databaseQuestions)
-        if (!params.database) {
-          params.database = databaseData.database
+        console.log('');
+        const databaseData = await inquirer.prompt(databaseQuestions);
+        if (!params.db) {
+          params.db = databaseData.database;
         }
         // console.log(JSON.stringify(databaseData))
+        console.log('');
       }
 
-      console.log('');
+      const databaseCredentials = await inquirer.prompt(getDatabaseCredentialsQuestions(params.db));
+      console.log('===databaseCredentials', databaseCredentials);
 
-      console.log('Installation steps:')
-      const spinner = ora('1 - Connecting to the database...').start();
+      // console.log('');
+
+      const spinner = ora('Connecting to the database...').start();
 
       setTimeout(() => {
         mongodbHelper.getDatabaseSchema('localhost', 27017, '', '', 'node-express-mongodb-server', false, false, schemas => {
-          spinner.succeed('1 - Connected to the database!');
+          spinner.succeed();
 
-          const spinner2 = ora('2 - Generating project files...').start();
+          const spinner2 = ora('Generating the project structure...').start();
           setTimeout(() => {
-            spinner2.succeed('2 - Project has been generated!');
+            spinner2.succeed();
             console.log('');
             ora('Your project is ready!').succeed();
             ora('You can now start your server with the following command: "npm run dev"').info();
