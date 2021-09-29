@@ -8,6 +8,7 @@ import axios from 'axios';
 
 import * as templateGenerator from './helpers/generator.js';
 import * as mongodbHelper from './helpers/mongodb.js';
+import * as generalHelper from './helpers/general.js';
 
 figlet('Adminmate', function(err, data) {
   console.log('');
@@ -38,23 +39,22 @@ const projectQuestions = [
 ];
 
 const checkReqValidity = params => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const authReq = axios({
-        method: 'POST',
-        url: 'http://localhost:3010/cli/check_auth',
-        data: {
-          project_id: params.pid,
-          hash: params.hash
-        }
-      })
-      .then(() => {
-        resolve('ok');
-      })
-      .catch(e => {
-        reject();
-      });
-    }, 2000);
+  return new Promise(async (resolve, reject) => {
+    await generalHelper.timeout(2000);
+    axios({
+      method: 'POST',
+      url: 'http://localhost:3010/cli/check_auth',
+      data: {
+        project_id: params.pid,
+        hash: params.hash
+      }
+    })
+    .then(() => {
+      resolve('ok');
+    })
+    .catch(e => {
+      reject();
+    });
   });
 };
 
@@ -121,6 +121,8 @@ const commandLine = () => {
     .action(async (params, options) => {
       // console.log(params);
 
+      // Check request validity ---------------------------------------------------------
+
       const spinnerReqValidity = ora('Checking request validity...').start();
       const authReq = await checkReqValidity(params).catch(() => {})
 
@@ -129,6 +131,8 @@ const commandLine = () => {
         return;
       }
       spinnerReqValidity.succeed('');
+
+      // Check missing params -----------------------------------------------------------
 
       const databaseQuestions = [];
       if (!params.db || !['mysql', 'postgresql', 'sqlite', 'mongodb'].includes(params.db)) {
@@ -142,9 +146,10 @@ const commandLine = () => {
         if (!params.db) {
           params.db = databaseData.database;
         }
-        // console.log(JSON.stringify(databaseData))
         console.log('');
       }
+
+      // Ask for the database creddentials ----------------------------------------------
 
       const databaseCredentials = await inquirer.prompt(getDatabaseCredentialsQuestions(params.db));
       console.log('===databaseCredentials', databaseCredentials);
@@ -153,22 +158,21 @@ const commandLine = () => {
 
       const spinner = ora('Connecting to the database...').start();
 
-      setTimeout(() => {
-        mongodbHelper.getDatabaseSchema('localhost', 27017, '', '', 'node-express-mongodb-server', false, false, schemas => {
-          spinner.succeed();
+      // Connect to database
+      mongodbHelper.getDatabaseSchemas('localhostmm', 27017, '', '', 'node-express-mongodb-server', false, false, schemas => {
+        spinner.succeed();
 
-          const spinner2 = ora('Generating the project structure...').start();
-          setTimeout(() => {
-            spinner2.succeed();
-            console.log('');
-            ora('Your project is ready!').succeed();
-            ora('You can now start your server with the following command: "npm run dev"').info();
-            console.log('');
-          }, 3000);
+        const spinner2 = ora('Generating the project structure...').start();
+        setTimeout(() => {
+          spinner2.succeed();
+          console.log('');
+          ora('Your project is ready!').succeed();
+          ora('You can now start your server with the following command: "npm run dev"').info();
+          console.log('');
+        }, 3000);
 
-          templateGenerator.createAdminTemplate('generated', 'mongodb', schemas);
-        });
-      }, 3000);
+        templateGenerator.createAdminTemplate('generated', 'mongodb', schemas);
+      });
     })
     .parse(process.argv);
 };

@@ -1,33 +1,43 @@
 import { MongoClient } from 'mongodb';
 import * as dataAnalyser from './dataAnalyser.js';
+import * as generalHelper from './general.js';
 
-export function getDatabaseSchema(host, port = 27017, user, password, dbName, srv = false, ssl = false, cb) {
+export async function getDatabaseSchemas(host, port = 27017, user, password, dbName, srv = false, ssl = false, cb) {
+  await generalHelper.timeout(2000);
+
   const uri = `mongodb${srv?'+srv':''}://${user}${user?':':''}${password}${user?'@':''}${host}${!srv?`:${port}`:''}/${dbName}${ssl?'?ssl=true':''}`;
-  MongoClient.connect(uri, { useNewUrlParser: true }, async function(err, client) {
-    if (err) return console.error(err);
 
-    const db = client.db(dbName);
+  const client = await MongoClient.connect(uri, { useNewUrlParser: true })
+    .catch(err => {
+      console.log('===database error', err.message);
+      return null;
+    });
 
-    const cleanSchemas = [];
+  if (!client) {
+    return;
+  }
 
-    const collections = await db.listCollections().toArray();
-    for (const collection of collections) {
+  const db = client.db(dbName);
 
-      // if (collection.name === 'projects') {
-      const collectionData = await db.collection(collection.name).find().limit(50).toArray();
-      const cleanSchema = dataAnalyser.analyse(collectionData);
+  const cleanSchemas = [];
 
-      // console.log('====', collectionData);
+  const collections = await db.listCollections().toArray();
+  for (const collection of collections) {
 
-      cleanSchemas.push({
-        collection: collection.name,
-        schema: cleanSchema
-      });
-      // }
-    }
+    // if (collection.name === 'projects') {
+    const collectionData = await db.collection(collection.name).find().limit(50).toArray();
+    const cleanSchema = dataAnalyser.analyse(collectionData);
 
-    client.close();
+    // console.log('====', collectionData);
 
-    cb(cleanSchemas);
-  });
+    cleanSchemas.push({
+      collection: collection.name,
+      schema: cleanSchema
+    });
+    // }
+  }
+
+  client.close();
+
+  cb(cleanSchemas);
 };
