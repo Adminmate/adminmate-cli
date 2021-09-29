@@ -158,21 +158,30 @@ const commandLine = () => {
 
       const spinner = ora('Connecting to the database...').start();
 
-      // Connect to database
-      mongodbHelper.getDatabaseSchemas('localhostmm', 27017, '', '', 'node-express-mongodb-server', false, false, schemas => {
-        spinner.succeed();
+      // Connect to the database --------------------------------------------------------
 
-        const spinner2 = ora('Generating the project structure...').start();
-        setTimeout(() => {
-          spinner2.succeed();
-          console.log('');
-          ora('Your project is ready!').succeed();
-          ora('You can now start your server with the following command: "npm run dev"').info();
-          console.log('');
-        }, 3000);
+      const schemas = await mongodbHelper.getDatabaseSchemas('localhost', 27017, '', '', 'node-express-mongodb-server', false, false)
+        .catch(err => {
+          spinner.fail(`Fail to connect to the database: ${err}`);
+        });
 
-        templateGenerator.createAdminTemplate('generated', 'mongodb', schemas);
-      });
+      if (!schemas) { return; }
+
+      spinner.succeed();
+
+      // Generate project template ------------------------------------------------------
+
+      const generationSpinner = ora('Generating the project structure...').start();
+
+      await generalHelper.timeout(2000);
+      templateGenerator.createAdminTemplate('generated', 'mongodb', schemas);
+
+      generationSpinner.succeed();
+
+      console.log('');
+      ora('Your project is ready!').succeed();
+      ora('You can now start your server with the following command: "npm run dev"').info();
+      console.log('');
     })
     .parse(process.argv);
 };
