@@ -26,8 +26,8 @@ const checkReqValidity = params => {
       method: 'POST',
       url: 'http://localhost:3010/cli/check_auth',
       data: {
-        project_id: params.pid,
-        hash: params.hash
+        project_id: params.id,
+        cli_token: params.hash
       }
     })
     .then(() => {
@@ -44,8 +44,8 @@ const validateStep = (params, step) => {
     method: 'POST',
     url: 'http://localhost:3010/cli/validate_step',
     data: {
-      project_id: params.pid,
-      hash: params.hash,
+      project_id: params.id,
+      cli_token: params.hash,
       step
     }
   })
