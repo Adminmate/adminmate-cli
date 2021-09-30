@@ -6,6 +6,7 @@ import figlet from 'figlet';
 import ora from 'ora';
 import axios from 'axios';
 
+import questions from './config/questions.js';
 import * as templateGenerator from './helpers/generator.js';
 import * as dbHelper from './helpers/database.js';
 import * as generalHelper from './helpers/general.js';
@@ -17,26 +18,6 @@ figlet('Adminmate', function(err, data) {
   // Launch command line program
   commandLine();
 });
-
-const databaseQuestion = {
-  name: 'database',
-  type: 'list',
-  message: 'What kind of database you want to use ?',
-  choices: ['mysql', 'postgresql', 'sqlite', 'mongodb']
-};
-// {
-//   name: 'uri',
-//   type: 'input',
-//   message: 'What the connection uri of your database ? (ex: mongodb://username:password@host:port/database)'
-// }
-
-const projectQuestions = [
-  {
-    name: 'master_password',
-    type: 'input',
-    message: 'What will be your master password (can be changed whenever you want) ?'
-  }
-];
 
 const checkReqValidity = params => {
   return new Promise(async (resolve, reject) => {
@@ -58,47 +39,23 @@ const checkReqValidity = params => {
   });
 };
 
-const mongodbQuestions = [
-  {
-    name: 'host',
-    type: 'input',
-    message: 'Type your database hostname',
-    default: 'localhost'
-  },
-  {
-    name: 'port',
-    type: 'number',
-    message: 'Type your database port',
-    default: 27017
-  },
-  {
-    name: 'user',
-    type: 'input',
-    message: 'Type your database username'
-  },
-  {
-    name: 'password',
-    type: 'password',
-    mask: true,
-    message: 'Type your database password'
-  },
-  {
-    name: 'name',
-    type: 'input',
-    message: 'Type your database name'
-  },
-  {
-    name: 'srv',
-    type: 'confirm',
-    default: false,
-    message: 'Do you use a SRV connection ?'
-  }
-];
+const validateStep = (params, step) => {
+  return axios({
+    method: 'POST',
+    url: 'http://localhost:3010/cli/validate_step',
+    data: {
+      project_id: params.pid,
+      hash: params.hash,
+      step
+    }
+  })
+  .catch(() => {});
+};
 
 const getDatabaseCredentialsQuestions = db => {
   switch (db) {
     case 'mongodb':
-      return mongodbQuestions;
+      return questions.mongodb;
     case 'mysql':
     case 'postgresql':
     case 'sqlite':
@@ -130,31 +87,28 @@ const commandLine = () => {
         spinnerReqValidity.fail('Your cli request is invalid')
         return;
       }
+
+      await validateStep(params, 'launch_cli');
       spinnerReqValidity.succeed('');
 
       // Check missing params -----------------------------------------------------------
 
       const databaseQuestions = [];
       if (!params.db || !['mysql', 'postgresql', 'sqlite', 'mongodb'].includes(params.db)) {
-        databaseQuestions.push(databaseQuestion);
+        databaseQuestions.push(questions.database);
       }
 
       // If there is missing info
       if (databaseQuestions.length) {
-        console.log('');
         const databaseData = await inquirer.prompt(databaseQuestions);
         if (!params.db) {
           params.db = databaseData.database;
         }
-        console.log('');
       }
 
       // Ask for the database creddentials ----------------------------------------------
 
       const databaseCredentials = await inquirer.prompt(getDatabaseCredentialsQuestions(params.db));
-      console.log('===databaseCredentials', databaseCredentials);
-
-      // console.log('');
 
       const spinner = ora('Connecting to the database...').start();
 
@@ -167,16 +121,24 @@ const commandLine = () => {
 
       if (!schemas) { return; }
 
+      await validateStep(params, 'database');
       spinner.succeed();
+
+      // Ask for last details -----------------------------------------------------------
+
+      const projectDetails = await inquirer.prompt(questions.general);
+      const projectConfig = { ...params, ...projectDetails };
+      await validateStep(params, 'master_password');
 
       // Generate project template ------------------------------------------------------
 
       const generationSpinner = ora('Generating the project structure...').start();
 
       await generalHelper.timeout(2000);
-      templateGenerator.createAdminTemplate('generated', params.db, schemas, params, databaseCredentials);
+      templateGenerator.createAdminTemplate('generated', params.db, schemas, projectConfig, databaseCredentials);
 
       generationSpinner.succeed();
+      await validateStep(params, 'generation');
 
       console.log('');
       ora('Your project is ready!').succeed();

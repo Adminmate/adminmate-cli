@@ -45,7 +45,7 @@ const createDotEnvFile = (projectPath, generalParams, dbParams) => {
 AM_PROJECT_ID=${generalParams.id}
 AM_SECRET_KEY=${generalParams.sk}
 AM_AUTH_KEY=${generalHelper.randomString(64)}
-AM_MASTER_PWD=
+AM_MASTER_PWD=${generalParams.master_password}
 `;
 
   createFile(`${projectPath}/.env`, fileContent);
