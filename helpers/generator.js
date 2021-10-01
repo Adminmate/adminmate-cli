@@ -5,14 +5,16 @@ import slugify from 'slugify';
 import handlebars from './handlebars.js';
 import * as generalHelper from './general.js';
 
-export async function createAdminTemplate(projectName, database, models, generalParams, dbParams) {
-  await createTemplateStructure(projectName, database, models, generalParams, dbParams);
+export async function createAdminTemplate(database, models, generalParams, dbParams) {
+  await createTemplateStructure(database, models, generalParams, dbParams);
 };
 
-const createTemplateStructure = (projectName, database, models, generalParams, dbParams) => {
+const createTemplateStructure = (database, models, generalParams, dbParams) => {
   return new Promise(async (resolve, reject) => {
+    const projectName = generalParams.name;
     const cwd = process.cwd();
-    const projectPath = `${cwd}/${projectName}`;
+    const targetDir = cwd.endsWith('/adminmate-cli') ? cwd.replace('/adminmate-cli', '') : cwd;
+    const projectPath = `${targetDir}/${slugify(projectName)}-adminmate-api`;
 
     // Remove generated dir - for dev only
     fs.rmdirSync(`${projectPath}`, { recursive: true });

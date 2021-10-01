@@ -135,7 +135,7 @@ const commandLine = () => {
       const generationSpinner = ora('Generating the project structure...').start();
 
       await generalHelper.timeout(2000);
-      templateGenerator.createAdminTemplate('generated', params.db, schemas, projectConfig, databaseCredentials);
+      templateGenerator.createAdminTemplate(params.db, schemas, projectConfig, databaseCredentials);
 
       generationSpinner.succeed();
       await validateStep(params, 'generation');

@@ -13,8 +13,7 @@ const normalizedPath = require('path').join(__dirname, 'models');
 
 require('fs').readdirSync(normalizedPath).forEach(file => {
   const modelName = file.replace('.js', '');
-  models[modelName] = require(`./models/${file}`);
+  models[modelName] = require(`./models/${file}`)(mongoose);
 });
-
 
 module.exports = { models, connectDb };

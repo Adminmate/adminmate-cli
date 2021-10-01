@@ -1,5 +1,5 @@
 // Get database instance
-const db = require('../database');
+const { models } = require('../database');
 
 module.exports = {
 
@@ -13,7 +13,7 @@ module.exports = {
     {{#each models as |model|}}
     {
       slug: '{{model.collection}}',
-      model: db.{{model.collection}},
+      model: models.{{model.collection}},
       actions: [],
       options: {
         canUpdate: true,

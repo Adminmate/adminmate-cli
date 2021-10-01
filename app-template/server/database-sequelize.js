@@ -36,12 +36,12 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-db.users = require('./models/user.js')(sequelize, Sequelize);
-db.rooms = require('./models/room.js')(sequelize, Sequelize);
-db.reservations = require('./models/reservation.js')(sequelize, Sequelize);
+const models = {};
+const normalizedPath = require('path').join(__dirname, 'models');
 
-db.users.associate(db);
-db.rooms.associate(db);
-db.reservations.associate(db);
+require('fs').readdirSync(normalizedPath).forEach(file => {
+  const modelName = file.replace('.js', '');
+  models[modelName] = require(`./models/${file}`)(sequelize, Sequelize);
+});
 
-module.exports = db;
+module.exports = { models, db };
