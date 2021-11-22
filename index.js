@@ -11,6 +11,9 @@ import * as templateGenerator from './helpers/generator.js';
 import * as dbHelper from './helpers/database.js';
 import * as generalHelper from './helpers/general.js';
 
+// Reset console.log
+console.log = () => {};
+
 figlet('Adminmate', function(err, data) {
   console.log('');
   console.log(data);
@@ -57,13 +60,10 @@ const getDatabaseCredentialsQuestions = db => {
     case 'mongodb':
       return questions.mongodb;
     case 'mysql':
+      return questions.mysql;
     case 'postgresql':
     case 'sqlite':
-      return [{
-        name: 'host',
-        type: 'input',
-        message: 'sql host'
-      }];
+      return [];
   }
 };
 

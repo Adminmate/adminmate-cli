@@ -9,36 +9,60 @@ export default {
     {
       name: 'host',
       type: 'input',
-      message: 'Type your database hostname',
+      message: 'Enter your MongoDB hostname',
       default: 'localhost'
     },
     {
       name: 'port',
       type: 'number',
-      message: 'Type your database port',
+      message: 'Enter your MongoDB port',
       default: 27017
     },
     {
       name: 'user',
       type: 'input',
-      message: 'Type your database username'
+      message: 'Enter your MongoDB username'
     },
     {
       name: 'password',
       type: 'password',
       mask: true,
-      message: 'Type your database password'
+      message: 'Enter your MongoDB password'
     },
     {
       name: 'name',
       type: 'input',
-      message: 'Type your database name'
+      message: 'Enter your MongoDB database name'
     },
     {
       name: 'srv',
       type: 'confirm',
       default: false,
       message: 'Do you use a SRV connection ?'
+    }
+  ],
+  mysql: [
+    {
+      name: 'host',
+      type: 'input',
+      message: 'Enter your MySQL hostname',
+      default: 'localhost'
+    },
+    {
+      name: 'user',
+      type: 'input',
+      message: 'Enter your MySQL username'
+    },
+    {
+      name: 'password',
+      type: 'password',
+      mask: true,
+      message: 'Enter your MySQL password'
+    },
+    {
+      name: 'name',
+      type: 'input',
+      message: 'Enter your MySQL database name'
     }
   ],
   general: [

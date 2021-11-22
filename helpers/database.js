@@ -1,10 +1,14 @@
 import { MongoClient } from 'mongodb';
+import SequelizeAuto from 'sequelize-auto';
 import * as dataAnalyser from './dataAnalyser.js';
 import * as generalHelper from './general.js';
 
 export function getDatabaseSchemas(database, params) {
   if (database === 'mongodb') {
     return getMongodbSchemas(params);
+  }
+  else if (database === 'mysql') {
+    return getMysqlSchemas(params);
   }
   return Promise.reject('This database is not available for the moment');
 };
@@ -40,20 +44,62 @@ const getMongodbSchemas = params => {
 
     const collections = await db.listCollections().toArray();
     for (const collection of collections) {
-
-      // if (collection.name === 'projects') {
       const collectionData = await db.collection(collection.name).find().limit(50).toArray();
       const cleanSchema = dataAnalyser.analyse(collectionData);
-      // console.log('====', collectionData);
 
       cleanSchemas.push({
         collection: collection.name,
         schema: cleanSchema
       });
-      // }
     }
 
     client.close();
+
+    resolve(cleanSchemas);
+  });
+};
+
+const getMysqlSchemas = params => {
+  return new Promise(async (resolve, reject) => {
+
+    if (!params.host) { return reject('host parameter is undefined'); }
+    if (!params.name) { return reject('name parameter is undefined'); }
+
+    const auto = new SequelizeAuto(params.name, params.user, params.password, {
+      host: params.host,
+      dialect: 'mysql', // 'mysql' | 'mariadb' | 'sqlite' | 'postgres' | 'mssql',
+      // directory: './models-test', // where to write files
+      noWrite: true,
+      noInitModels: true,
+      additional: {
+        timestamps: false
+      }
+    });
+
+    const cleanSchemas = [];
+
+    // Connect to the database
+    const data = await auto.run().catch(e => {
+      console.log('===err', e);
+    });
+
+    if (!data) {
+      return;
+    }
+
+    if (data && data.text) {
+      const keys = Object.keys(data.text);
+      keys.forEach(tableName => {
+        if (tableName !== 'SequelizeMeta') {
+          cleanSchemas.push({
+            collection: tableName,
+            schema: data.text[tableName]
+          });
+        }
+      });
+    }
+
+    // console.log(cleanSchemas);
 
     resolve(cleanSchemas);
   });
