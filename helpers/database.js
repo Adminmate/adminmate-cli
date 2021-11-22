@@ -13,7 +13,7 @@ const getMongodbSchemas = params => {
   return new Promise(async (resolve, reject) => {
 
     if (!params.host) { return reject('host parameter is undefined'); }
-    if (!params.name) { return reject('host parameter is undefined'); }
+    if (!params.name) { return reject('name parameter is undefined'); }
 
     await generalHelper.timeout(2000);
 

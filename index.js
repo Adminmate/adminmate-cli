@@ -119,7 +119,9 @@ const commandLine = () => {
           spinner.fail(`Fail to connect to the database: ${err}`);
         });
 
-      if (!schemas) { return; }
+      if (!schemas) {
+        return;
+      }
 
       await validateStep(params, 'database');
       spinner.succeed();

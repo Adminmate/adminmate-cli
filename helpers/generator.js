@@ -5,6 +5,10 @@ import slugify from 'slugify';
 import handlebars from './handlebars.js';
 import * as generalHelper from './general.js';
 
+const databaseTemplates = {
+  'mongodb': 'mongoose'
+};
+
 export async function createAdminTemplate(database, models, generalParams, dbParams) {
   await createTemplateStructure(database, models, generalParams, dbParams);
 };
@@ -26,7 +30,7 @@ const createTemplateStructure = (database, models, generalParams, dbParams) => {
     await mkdirp(`${projectPath}/server/models`);
 
     createServerJsFile(projectPath);
-    createDatabaseFile(projectPath);
+    createDatabaseFile(projectPath, database);
     createPackageJsonFile(projectName, projectPath);
     createDotEnvFile(projectPath, generalParams, dbParams);
     createGitIgnoreFile(projectPath);
@@ -74,10 +78,6 @@ const createAmConfigFile = (projectPath, database, models) => {
 const createModelFile = (projectPath, database, model) => {
   const cwd = process.cwd();
 
-  const databaseTemplates = {
-    'mongodb': 'mongoose'
-  };
-
   const tplContent = fs.readFileSync(`${cwd}/app-template/server/models/schema-${databaseTemplates[database]}.hbs`, 'utf8');
   const compiledTplContent = handlebars.compile(tplContent);
   const result = compiledTplContent({
@@ -116,10 +116,10 @@ const createPackageJsonFile = (projectName, projectPath) => {
   createFile(`${projectPath}/package.json`, packageJson);
 };
 
-const createDatabaseFile = (projectPath) => {
+const createDatabaseFile = (projectPath, database) => {
   const cwd = process.cwd();
 
-  fs.copyFileSync(`${cwd}/app-template/server/database-mongoose.js`, `${projectPath}/server/database.js`);
+  fs.copyFileSync(`${cwd}/app-template/server/database-${databaseTemplates[database]}.js`, `${projectPath}/server/database.js`);
 };
 
 const createServerJsFile = (projectPath) => {
