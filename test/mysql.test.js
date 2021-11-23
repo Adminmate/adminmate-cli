@@ -10,6 +10,7 @@ describe('MySQL', () => {
       name: 'db'
     };
     const schema = await getDatabaseSchemas('mysql', dbParams);
-    expect(schema).toMatchSpecificSnapshot('./__snapshots__/mysql.shot');
+    const orderedSchema = schema.sort((a, b) => a.collection.localeCompare(b.collection));
+    expect(orderedSchema).toMatchSpecificSnapshot('./__snapshots__/mysql.shot');
   });
 });
