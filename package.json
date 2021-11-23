@@ -11,7 +11,18 @@
     "test": "jest --runInBand"
   },
   "author": "Marc Delalonde",
+  "homepage": "http://adminmate.io",
   "license": "GPL-3.0",
+  "keywords": [
+    "adminmate",
+    "admin",
+    "panel",
+    "interface",
+    "back-office",
+    "mysql",
+    "mongodb",
+    "postgresql"
+  ],
   "dependencies": {
     "axios": "^0.21.4",
     "commander": "^8.2.0",
