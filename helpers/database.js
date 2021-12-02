@@ -13,6 +13,55 @@ export function getDatabaseSchemas(database, params) {
   return Promise.reject('This database is not available for the moment');
 };
 
+const getMatchingCollection = (datasets, idsToLookFor) => {
+  let potentialCollection = '';
+  Object.keys(datasets).forEach(collectionName => {
+    const collectionData = datasets[collectionName];
+    const allIds = collectionData.map(itemData => itemData._id.toString());
+    idsToLookFor.forEach(value => {
+      if (allIds.includes(value)) {
+        potentialCollection = collectionName;
+      }
+    });
+  });
+  return potentialCollection;
+};
+
+const getRelationships = datasets => {
+  const relationships = {};
+
+  Object.keys(datasets).map(collectionName => {
+    relationships[collectionName] = [];
+    const foreignKeys = {};
+    const collectionData = datasets[collectionName];
+
+    collectionData.forEach(itemData => {
+      Object.keys(itemData).map(fieldKey => {
+        const checkForHexRegExp = new RegExp('^[0-9a-fA-F]{24}$');
+        if (fieldKey !== '_id' && checkForHexRegExp.test(itemData[fieldKey])) {
+          if (foreignKeys[fieldKey]) {
+            foreignKeys[fieldKey].push(itemData[fieldKey].toString());
+          }
+          else {
+            foreignKeys[fieldKey] = [itemData[fieldKey].toString()];
+          }
+        }
+      });
+    });
+
+    Object.keys(foreignKeys).map(fieldKey => {
+      const values = foreignKeys[fieldKey];
+      const matchingCollection = getMatchingCollection(datasets, values);
+      if (matchingCollection) {
+        relationships[collectionName].push({ field: fieldKey, ref: matchingCollection });
+      }
+    });
+
+  });
+
+  return relationships;
+};
+
 const getMongodbSchemas = params => {
   return new Promise(async (resolve, reject) => {
 
@@ -40,18 +89,25 @@ const getMongodbSchemas = params => {
     // Connect to the proper db
     const db = client.db(params.name);
 
-    const cleanSchemas = [];
-
+    const datasets = {};
     const collections = await db.listCollections().toArray();
     for (const collection of collections) {
       const collectionData = await db.collection(collection.name).find().limit(50).toArray();
-      const cleanSchema = dataAnalyser.analyse(collectionData);
+      datasets[collection.name] = collectionData;
+    }
 
+    // Find potential relationships
+    const relationships = getRelationships(datasets);
+
+    const cleanSchemas = [];
+    Object.keys(datasets).map(collectionName => {
+      const collectionData = datasets[collectionName];
+      const cleanSchema = dataAnalyser.analyse(collectionData, relationships[collectionName]);
       cleanSchemas.push({
-        collection: collection.name,
+        collection: collectionName,
         schema: cleanSchema
       });
-    }
+    });
 
     client.close();
 

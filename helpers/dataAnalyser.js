@@ -4,7 +4,7 @@ import moment from 'moment';
 let _dataStructure = {};
 let _finalDataStructure = {};
 
-export function analyse(dataSet) {
+export function analyse(dataSet, relationships) {
   if (!Array.isArray(dataSet)) {
     return 'Should be an array';
   }
@@ -15,7 +15,7 @@ export function analyse(dataSet) {
   const dataSetStructure = iterate(cleanDataSet);
 
   // Clean the dataset structure
-  const cleanDataSetStructure = cleanDataStructure(dataSetStructure, cleanDataSet.length);
+  const cleanDataSetStructure = cleanDataStructure(dataSetStructure, cleanDataSet.length, relationships);
 
   return cleanDataSetStructure;
 }
@@ -88,18 +88,18 @@ const iterateRecursive = (obj, cursor = '') => {
 
 // Data structure cleaning --------------------------------------------------------------
 
-const cleanDataStructure = (dataSetStructure, totalCount) => {
+const cleanDataStructure = (dataSetStructure, totalCount, relationships) => {
   _finalDataStructure = {};
-  cleanDataStructureRecursive(dataSetStructure, '', totalCount);
+  cleanDataStructureRecursive(dataSetStructure, '', totalCount, relationships);
   return _finalDataStructure;
 };
 
-const cleanDataStructureRecursive = (obj, cursor = '', dataSetLength) => {
+const cleanDataStructureRecursive = (obj, cursor = '', dataSetLength, relationships) => {
   Object.keys(obj).forEach(key => {
     const path = cursor ? `${cursor}.${key}` : key;
 
     if (obj[key] && typeof obj[key] === 'object' && typeof obj[key].type === 'undefined') {
-      cleanDataStructureRecursive(obj[key], path, dataSetLength);
+      cleanDataStructureRecursive(obj[key], path, dataSetLength, relationships);
     }
     else {
       const currentProperties = _.get(_dataStructure, path);
@@ -109,6 +109,14 @@ const cleanDataStructureRecursive = (obj, cursor = '', dataSetLength) => {
       if (currentProperties.count === dataSetLength) {
         newProperties.required = true;
       }
+
+      // Check potential relationship for this path
+      const matchingRelationships = relationships.find(r => r.field === path);
+      if (matchingRelationships) {
+        newProperties.ref = matchingRelationships.ref;
+      }
+
+      // Remove count
       delete newProperties.count;
 
       _.set(_finalDataStructure, path, newProperties);
