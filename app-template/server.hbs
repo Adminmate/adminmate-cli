@@ -10,7 +10,6 @@ const app = express();
 
 // Global vars
 global.NODE_ENV = env;
-global.AM_DEV_MODE = !!process.env.npm_config_devmode;
 
 // Set up jade
 app.set('port', port);
@@ -36,11 +35,7 @@ db.sequelize.sync().then(() => {
 {{/ifEquals}}
 
 // Add Adminmate
-{{#ifEquals database 'mongodb' }}
-const Adminmate = require(global.AM_DEV_MODE ? '../adminmate-express-mongoose' : 'adminmate-express-mongoose');
-{{else}}
-const Adminmate = require(global.AM_DEV_MODE ? '../adminmate-express-sequelize' : 'adminmate-express-sequelize');
-{{/ifEquals}}
+const Adminmate = require({{#ifEquals database 'mongodb' }}'adminmate-express-mongoose'{{else}}'adminmate-express-sequelize'{{/ifEquals}});
 app.use(Adminmate.init(require('./server/config/adminmate')));
 
 // Handle error 404 page

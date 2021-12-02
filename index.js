@@ -14,6 +14,10 @@ import * as generalHelper from './helpers/general.js';
 // Reset console.log
 console.log = () => {};
 
+const cwd = process.cwd();
+const IS_PROD = !cwd.endsWith('/adminmate-cli');
+const API_URL = IS_PROD ? 'https://api.adminmate.io' : 'http://localhost:3010';
+
 figlet('Adminmate', function(err, data) {
   console.log('');
   console.log(data);
@@ -27,7 +31,7 @@ const checkReqValidity = params => {
     await generalHelper.timeout(2000);
     axios({
       method: 'POST',
-      url: 'http://localhost:3010/cli/check_auth',
+      url: `${API_URL}/cli/check_auth`,
       data: {
         project_id: params.id,
         cli_token: params.hash
@@ -45,7 +49,7 @@ const checkReqValidity = params => {
 const validateStep = (params, step) => {
   return axios({
     method: 'POST',
-    url: 'http://localhost:3010/cli/validate_step',
+    url: `${API_URL}/cli/validate_step`,
     data: {
       project_id: params.id,
       cli_token: params.hash,
@@ -144,7 +148,7 @@ const commandLine = () => {
 
       console.log('');
       ora('Your project is ready!').succeed();
-      ora('You can now start your server with the following command: "npm run dev"').info();
+      ora('You can now start your server with the following command: "npm start"').info();
       console.log('');
     })
     .parse(process.argv);
