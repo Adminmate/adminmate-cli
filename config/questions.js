@@ -32,7 +32,10 @@ export default {
     {
       name: 'name',
       type: 'input',
-      message: 'Enter your MongoDB database name'
+      message: 'Enter your MongoDB database name',
+      validate: value => {
+        return value ? true : 'You have to set your database name';
+      }
     },
     {
       name: 'srv',
@@ -70,7 +73,10 @@ export default {
       name: 'master_password',
       type: 'password',
       mask: true,
-      message: 'Type your master password (can be changed later)'
+      message: 'Type your master password (can be changed later)',
+      validate: value => {
+        return value ? true : 'You have to set a master password';
+      }
     }
   ]
 };

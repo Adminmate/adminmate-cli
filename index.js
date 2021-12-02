@@ -127,6 +127,11 @@ const commandLine = () => {
         return;
       }
 
+      if (schemas.length === 0) {
+        spinner.fail('There is no collection in your mongodb database');
+        return;
+      }
+
       await validateStep(params, 'database');
       spinner.succeed();
 
