@@ -1,32 +1,13 @@
-const dbConfig = {
-  // HOST: '',
-  USER: 'demo',
-  PASSWORD: 'demo',
-  DB: 'demo',
-  dialect: 'sqlite',
-  storage: ':memory:',
-  // pool: {
-  //   max: 5,
-  //   min: 0,
-  //   acquire: 30000,
-  //   idle: 10000
-  // }
-};
-
 const Sequelize = require('sequelize');
-const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
-  // host: dbConfig.HOST,
-  dialect: dbConfig.dialect,
-  //storage: dbConfig.storage,
-  storage: './database.sqlite',
-  // pool: {
-  //   max: dbConfig.pool.max,
-  //   min: dbConfig.pool.min,
-  //   acquire: dbConfig.pool.acquire,
-  //   idle: dbConfig.pool.idle
-  // },
+
+const sequelize = new Sequelize(process.env.AM_DB_URL, {
+  pool: {
+    minConnections: 1,
+    maxConnections: 5
+  },
+  // storage: './database.sqlite',
   // define: {
-  //   // timestamps: false, // disable createdAt and updatedAt fields
+  //   timestamps: false, // disable createdAt and updatedAt fields
   //   freezeTableName: true // no table name auto-pluralization
   // }
 });

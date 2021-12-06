@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
 
 const connectDb = () => {
-  return mongoose.connect('mongodb://localhost:27017/node-express-mongodb-server', {
+  // todo config proper
+  // 'mongodb://localhost:27017/node-express-mongodb-server'
+  return mongoose.connect(process.env.AM_DB_URL, {
     useNewUrlParser: true,
     useFindAndModify: false,
     useUnifiedTopology: true

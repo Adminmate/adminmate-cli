@@ -66,6 +66,7 @@ const getDatabaseCredentialsQuestions = db => {
     case 'mysql':
       return questions.mysql;
     case 'postgresql':
+      return questions.postgresql;
     case 'sqlite':
       return [];
   }
@@ -128,7 +129,7 @@ const commandLine = () => {
       }
 
       if (schemas.length === 0) {
-        spinner.fail('There is no collection in your mongodb database');
+        spinner.fail(`There is no collection in your ${params.db} database`);
         return;
       }
 

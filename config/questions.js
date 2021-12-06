@@ -52,6 +52,12 @@ export default {
       default: 'localhost'
     },
     {
+      name: 'port',
+      type: 'input',
+      message: 'Enter your MySQL port',
+      default: 3306
+    },
+    {
       name: 'user',
       type: 'input',
       message: 'Enter your MySQL username'
@@ -65,7 +71,43 @@ export default {
     {
       name: 'name',
       type: 'input',
-      message: 'Enter your MySQL database name'
+      message: 'Enter your MySQL database name',
+      validate: value => {
+        return value ? true : 'You have to set your database name';
+      }
+    }
+  ],
+  postgresql: [
+    {
+      name: 'host',
+      type: 'input',
+      message: 'Enter your PostgreSQL hostname',
+      default: 'localhost'
+    },
+    {
+      name: 'port',
+      type: 'input',
+      message: 'Enter your PostgreSQL port',
+      default: 3306
+    },
+    {
+      name: 'user',
+      type: 'input',
+      message: 'Enter your PostgreSQL username'
+    },
+    {
+      name: 'password',
+      type: 'password',
+      mask: true,
+      message: 'Enter your PostgreSQL password'
+    },
+    {
+      name: 'name',
+      type: 'input',
+      message: 'Enter your PostgreSQL database name',
+      validate: value => {
+        return value ? true : 'You have to set your database name';
+      }
     }
   ],
   general: [

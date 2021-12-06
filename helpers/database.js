@@ -1,14 +1,23 @@
+import { unregisterHelper } from 'handlebars';
 import { MongoClient } from 'mongodb';
 import SequelizeAuto from 'sequelize-auto';
 import * as dataAnalyser from './dataAnalyser.js';
 import * as generalHelper from './general.js';
 
+const sequelizeDialects = {
+  mysql: 'mysql',
+  postgressql: 'postgres',
+  mariadb: 'mariadb',
+  sqlite: 'sqlite',
+  mssql: 'mssql'
+};
+
 export function getDatabaseSchemas(database, params) {
   if (database === 'mongodb') {
     return getMongodbSchemas(params);
   }
-  else if (database === 'mysql') {
-    return getMysqlSchemas(params);
+  else if (['mysql', 'postgresql'].includes(database)) {
+    return getSQLSchemas(database, params);
   }
   return Promise.reject('This database is not available for the moment');
 };
@@ -62,6 +71,21 @@ const getRelationships = datasets => {
   return relationships;
 };
 
+const getMongodbConnectionUrl = params => {
+  const protocol = `mongodb${params.srv ? '+srv' : ''}`;
+  const cred = `${params.user}${params.user ? ':' : ''}${params.password}`;
+  const host = `${params.host}${!params.srv ? `:${params.port}` : ''}`;
+  const dbAndParams = `${params.name}${params.ssl?'?ssl=true':''}`;
+  const uri = `${protocol}://${cred}${cred ? '@' : ''}${host}/${dbAndParams}`;
+  return uri;
+};
+
+const getSQLConnectionUrl = (database, params) => {
+  const protocol = sequelizeDialects[database];
+  const uri = `${protocol}://`;
+  return uri;
+};
+
 const getMongodbSchemas = params => {
   return new Promise(async (resolve, reject) => {
 
@@ -70,11 +94,8 @@ const getMongodbSchemas = params => {
 
     await generalHelper.timeout(2000);
 
-    const protocol = `mongodb${params.srv ? '+srv' : ''}`;
-    const cred = `${params.user}${params.user ? ':' : ''}${params.password}`;
-    const host = `${params.host}${!params.srv ? `:${params.port}` : ''}`;
-    const dbAndParams = `${params.name}${params.ssl?'?ssl=true':''}`;
-    const uri = `${protocol}://${cred}${cred ? '@' : ''}${host}/${dbAndParams}`;
+    // Get mongodb connection url
+    const uri = getMongodbConnectionUrl(params);
 
     const client = await MongoClient.connect(uri, { useNewUrlParser: true })
       .catch(err => {
@@ -115,15 +136,18 @@ const getMongodbSchemas = params => {
   });
 };
 
-const getMysqlSchemas = params => {
+const getSQLSchemas = (database, params) => {
   return new Promise(async (resolve, reject) => {
 
     if (!params.host) { return reject('host parameter is undefined'); }
     if (!params.name) { return reject('name parameter is undefined'); }
 
+    console.warn(params);
+
     const auto = new SequelizeAuto(params.name, params.user, params.password, {
       host: params.host,
-      dialect: 'mysql', // 'mysql' | 'mariadb' | 'sqlite' | 'postgres' | 'mssql',
+      port: params.port,
+      dialect: sequelizeDialects[database], // 'mysql' | 'mariadb' | 'sqlite' | 'postgres' | 'mssql',
       // directory: './models-test', // where to write files
       noWrite: true,
       noInitModels: true,
@@ -142,6 +166,8 @@ const getMysqlSchemas = params => {
     if (!data) {
       return;
     }
+
+    console.warn('====data', data.text);
 
     if (data && data.text) {
       const keys = Object.keys(data.text);
