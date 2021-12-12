@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`MySQL MySQL to Sequelize schema 1`] = `
+exports[`MySQL MySQL to Sequelize schemas 1`] = `
 "// Get database instance
 const { models } = require('../database');
 

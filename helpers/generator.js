@@ -16,9 +16,9 @@ const databaseTemplates = {
 
 const databasePackages = {
   mongodb: '"adminmate-express-mongoose": "^1.2.6"',
-  mysql: '"adminmate-express-sequelize": "^1.0.3"',
-  postgresql: '"adminmate-express-sequelize": "^1.0.3"',
-  mariadb: '"adminmate-express-sequelize": "^1.0.3"'
+  mysql: '"adminmate-express-sequelize": "^1.0.4"',
+  postgresql: '"adminmate-express-sequelize": "^1.0.4"',
+  mariadb: '"adminmate-express-sequelize": "^1.0.4"'
 };
 
 export async function createAdminTemplate(databaseType, models, generalParams, dbParams) {
@@ -45,9 +45,9 @@ const createTemplateStructure = (databaseType, models, generalParams, dbParams) 
     mkdirp.sync(`${projectPath}/server/middlewares`);
     mkdirp.sync(`${projectPath}/server/models`);
 
-    createServerJsFile(projectPath);
+    createServerJsFile(projectPath, databaseType);
     createDatabaseFile(projectPath, databaseType);
-    createPackageJsonFile(projectName, projectPath, databaseType);
+    createPackageJsonFile(projectPath, projectName, databaseType);
     createDotEnvFile(projectPath, generalParams, dbParams, databaseType, isDev);
     createGitIgnoreFile(projectPath);
 
@@ -70,7 +70,7 @@ const createDotEnvFile = (projectPath, generalParams, dbParams, database, isDev)
 
 AM_PROJECT_ID=${generalParams.id}
 AM_SECRET_KEY=${generalParams.sk}
-AM_AUTH_KEY=${isDev ? 'auth-key' : generalHelper.randomString(64)}
+AM_AUTH_KEY=${isDev ? 'auth_key' : generalHelper.randomString(64)}
 AM_MASTER_PWD=${generalParams.master_password}
 AM_DB_URL=${amDbUrl}
 `;
@@ -115,9 +115,14 @@ const createModelFile = (projectPath, database, model) => {
   }
 };
 
-const createPackageJsonFile = (projectName, projectPath, database) => {
+const createPackageJsonFile = (projectPath, projectName, database) => {
   const projectSlug = slugify(projectName).toLocaleLowerCase();
   const ormNpmPackage = databasePackages[database];
+
+  let extraPackages = '';
+  if (database === 'mysql') {
+    extraPackages = `"mysql2": "^2.3.3"`;
+  }
 
   const packageJson = `
 {
@@ -130,7 +135,8 @@ const createPackageJsonFile = (projectName, projectPath, database) => {
   "dependencies": {
     ${ormNpmPackage},
     "dotenv": "^10.0.0",
-    "express": "^4.16.4"
+    "express": "^4.16.4"${extraPackages ? ',' : ''}
+    ${extraPackages}
   }
 }`;
 
@@ -141,10 +147,10 @@ const createDatabaseFile = (projectPath, database) => {
   fs.copyFileSync(`${appRoot.path}/app-template/server/database-${databaseTemplates[database]}.js`, `${projectPath}/server/database.js`);
 };
 
-const createServerJsFile = (projectPath) => {
+const createServerJsFile = (projectPath, databaseType) => {
   const serverJsContent = fs.readFileSync(`${appRoot.path}/app-template/server.hbs`, 'utf8');
   const serverJsTemplate = handlebars.compile(serverJsContent);
-  const result = serverJsTemplate({ database: 'mongodb' });
+  const result = serverJsTemplate({ database: databaseType });
 
   createFile(`${projectPath}/server.js`, result);
 };

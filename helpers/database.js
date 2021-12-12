@@ -1,4 +1,4 @@
-import { unregisterHelper } from 'handlebars';
+import _ from 'lodash';
 import { MongoClient } from 'mongodb';
 import SequelizeAuto from 'sequelize-auto';
 import * as dataAnalyser from './dataAnalyser.js';
@@ -34,9 +34,8 @@ export const getMongodbConnectionUrl = params => {
 export const getSQLConnectionUrl = (database, params) => {
   const protocol = sequelizeDialects[database];
   const cred = `${params.user}${params.user ? ':' : ''}${params.password}`;
-  const host = `${params.host}${!params.srv ? `:${params.port}` : ''}`;
-  const dbAndParams = `${params.name}${params.ssl?'?ssl=true':''}`;
-  const uri = `${protocol}://${cred}${cred ? '@' : ''}${host}/${dbAndParams}`;
+  const host = `${params.host}:${params.port}`;
+  const uri = `${protocol}://${cred}${cred ? '@' : ''}${host}/${params.name}`;
   return uri;
 };
 
@@ -123,7 +122,7 @@ const getMongodbSchemas = params => {
     // Find potential relationships
     const relationships = getRelationships(datasets);
 
-    const cleanSchemas = [];
+    let cleanSchemas = [];
     Object.keys(datasets).map(collectionName => {
       const collectionData = datasets[collectionName];
       const cleanSchema = dataAnalyser.analyse(collectionData, relationships[collectionName]);
@@ -132,6 +131,9 @@ const getMongodbSchemas = params => {
         schema: cleanSchema
       });
     });
+
+    // Order by model name
+    cleanSchemas = _.orderBy(cleanSchemas, ['collection'], ['asc']);
 
     client.close();
 
@@ -157,7 +159,7 @@ const getSQLSchemas = (database, params) => {
       }
     });
 
-    const cleanSchemas = [];
+    let cleanSchemas = [];
 
     // Connect to the database
     const data = await auto.run().catch(e => {
@@ -169,8 +171,7 @@ const getSQLSchemas = (database, params) => {
     }
 
     if (data && data.text) {
-      const keys = Object.keys(data.text);
-      keys.forEach(tableName => {
+      Object.keys(data.text).forEach(tableName => {
         if (tableName !== 'SequelizeMeta') {
           cleanSchemas.push({
             collection: tableName,
@@ -178,9 +179,9 @@ const getSQLSchemas = (database, params) => {
           });
         }
       });
+      // Order by model name
+      cleanSchemas = _.orderBy(cleanSchemas, ['collection'], ['asc']);
     }
-
-    // console.log(cleanSchemas);
 
     resolve(cleanSchemas);
   });

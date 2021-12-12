@@ -8,7 +8,7 @@ import { createAdminTemplate } from '../../helpers/generator';
 console.log = () => {};
 
 describe('MySQL', () => {
-  it('MySQL to Sequelize schema', async () => {
+  it('MySQL to Sequelize schemas', async () => {
     const dbParams = {
       host: 'localhost',
       user: 'demo',

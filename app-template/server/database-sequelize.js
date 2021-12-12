@@ -5,6 +5,7 @@ const sequelize = new Sequelize(process.env.AM_DB_URL, {
     minConnections: 1,
     maxConnections: 5
   },
+  logging: false
   // storage: './database.sqlite',
   // define: {
   //   timestamps: false, // disable createdAt and updatedAt fields
@@ -17,9 +18,9 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-const models = {};
 const normalizedPath = require('path').join(__dirname, 'models');
 
+const models = {};
 require('fs').readdirSync(normalizedPath).forEach(file => {
   const modelName = file.replace('.js', '');
   models[modelName] = require(`./models/${file}`)(sequelize, Sequelize);
