@@ -1,0 +1,45 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MySQL MySQL to Sequelize schema 1`] = `
+"// Import all env vars from .env file
+require('dotenv').config();
+const express = require('express');
+
+// Environment vars
+const env = process.env.NODE_ENV || 'development';
+const port = process.env.PORT || 3020;
+
+const app = express();
+
+// Global vars
+global.NODE_ENV = env;
+
+// Set up jade
+app.set('port', port);
+app.use(express.json());
+app.use(express.urlencoded({
+  extended: true
+}));
+
+// Connect to database
+const { connectDb } = require('./server/database');
+connectDb().then(async () => {
+  console.log('Adminmate Admin has started');
+  console.log(\`Env: \${global.NODE_ENV}\`);
+});
+
+// Add Adminmate
+const Adminmate = require('adminmate-express-mongoose');
+app.use(Adminmate.init(require('./server/config/adminmate')));
+
+// Handle error 404 page
+app.use((req, res) => {
+  res.status(404).json({ message: '404 Not Found' });
+});
+
+// Listen for requests
+app.listen(port, () => console.log(\`App listening on port \${port}\`));
+
+// Handle all uncaught errors
+process.on('uncaughtException', err => console.log(err));"
+`;

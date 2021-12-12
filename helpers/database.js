@@ -22,6 +22,24 @@ export function getDatabaseSchemas(database, params) {
   return Promise.reject('This database is not available for the moment');
 };
 
+export const getMongodbConnectionUrl = params => {
+  const protocol = `mongodb${params.srv ? '+srv' : ''}`;
+  const cred = `${params.user}${params.user ? ':' : ''}${params.password}`;
+  const host = `${params.host}${!params.srv ? `:${params.port}` : ''}`;
+  const dbAndParams = `${params.name}${params.ssl?'?ssl=true':''}`;
+  const uri = `${protocol}://${cred}${cred ? '@' : ''}${host}/${dbAndParams}`;
+  return uri;
+};
+
+export const getSQLConnectionUrl = (database, params) => {
+  const protocol = sequelizeDialects[database];
+  const cred = `${params.user}${params.user ? ':' : ''}${params.password}`;
+  const host = `${params.host}${!params.srv ? `:${params.port}` : ''}`;
+  const dbAndParams = `${params.name}${params.ssl?'?ssl=true':''}`;
+  const uri = `${protocol}://${cred}${cred ? '@' : ''}${host}/${dbAndParams}`;
+  return uri;
+};
+
 const getMatchingCollection = (datasets, idsToLookFor) => {
   let potentialCollection = '';
   Object.keys(datasets).forEach(collectionName => {
@@ -69,21 +87,6 @@ const getRelationships = datasets => {
   });
 
   return relationships;
-};
-
-const getMongodbConnectionUrl = params => {
-  const protocol = `mongodb${params.srv ? '+srv' : ''}`;
-  const cred = `${params.user}${params.user ? ':' : ''}${params.password}`;
-  const host = `${params.host}${!params.srv ? `:${params.port}` : ''}`;
-  const dbAndParams = `${params.name}${params.ssl?'?ssl=true':''}`;
-  const uri = `${protocol}://${cred}${cred ? '@' : ''}${host}/${dbAndParams}`;
-  return uri;
-};
-
-const getSQLConnectionUrl = (database, params) => {
-  const protocol = sequelizeDialects[database];
-  const uri = `${protocol}://`;
-  return uri;
 };
 
 const getMongodbSchemas = params => {
@@ -142,8 +145,6 @@ const getSQLSchemas = (database, params) => {
     if (!params.host) { return reject('host parameter is undefined'); }
     if (!params.name) { return reject('name parameter is undefined'); }
 
-    console.warn(params);
-
     const auto = new SequelizeAuto(params.name, params.user, params.password, {
       host: params.host,
       port: params.port,
@@ -166,8 +167,6 @@ const getSQLSchemas = (database, params) => {
     if (!data) {
       return;
     }
-
-    console.warn('====data', data.text);
 
     if (data && data.text) {
       const keys = Object.keys(data.text);

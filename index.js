@@ -119,7 +119,7 @@ const commandLine = () => {
 
       // Connect to the database --------------------------------------------------------
 
-      const schemas = await dbHelper.getDatabaseSchemas(params.db, databaseCredentials)//'localhost', 27017, '', '', 'node-express-mongodb-server', false, false)
+      const schemas = await dbHelper.getDatabaseSchemas(params.db, databaseCredentials)
         .catch(err => {
           spinner.fail(`Fail to connect to the database: ${err}`);
         });

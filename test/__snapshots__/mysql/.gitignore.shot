@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MySQL MySQL to Sequelize schema 1`] = `
+"node_modules
+.env
+.DS_Store
+"
+`;

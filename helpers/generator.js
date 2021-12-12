@@ -21,43 +21,47 @@ const databasePackages = {
   mariadb: '"adminmate-express-sequelize": "^1.0.3"'
 };
 
-export async function createAdminTemplate(database, models, generalParams, dbParams) {
-  await createTemplateStructure(database, models, generalParams, dbParams);
+export async function createAdminTemplate(databaseType, models, generalParams, dbParams) {
+  return await createTemplateStructure(databaseType, models, generalParams, dbParams);
 };
 
-const createTemplateStructure = (database, models, generalParams, dbParams) => {
+const createTemplateStructure = (databaseType, models, generalParams, dbParams) => {
   return new Promise(async (resolve, reject) => {
     const projectName = generalParams.name;
     const cwd = process.cwd();
-    const targetDir = cwd.endsWith('/adminmate-cli') ? cwd.replace('/adminmate-cli', '') : cwd;
+    const isDev = cwd.endsWith('/adminmate-cli');
+    const targetDir = isDev ? cwd.replace('/adminmate-cli', '') : cwd;
     const projectPath = `${targetDir}/${slugify(projectName).toLocaleLowerCase()}-adminmate-api`;
 
     // Remove generated dir - for dev only
-    fs.rmdirSync(`${projectPath}`, { recursive: true });
+    if (isDev) {
+      fs.rmdirSync(`${projectPath}`, { recursive: true });
+    }
 
-    await mkdirp(`${projectPath}/server`);
-    await mkdirp(`${projectPath}/server/config`);
-    await mkdirp(`${projectPath}/server/controllers`);
-    await mkdirp(`${projectPath}/server/middlewares`);
-    await mkdirp(`${projectPath}/server/models`);
+    // Create directories
+    mkdirp.sync(`${projectPath}/server`);
+    mkdirp.sync(`${projectPath}/server/config`);
+    mkdirp.sync(`${projectPath}/server/controllers`);
+    mkdirp.sync(`${projectPath}/server/middlewares`);
+    mkdirp.sync(`${projectPath}/server/models`);
 
     createServerJsFile(projectPath);
-    createDatabaseFile(projectPath, database);
-    createPackageJsonFile(projectName, projectPath, database);
-    createDotEnvFile(projectPath, generalParams, dbParams, database);
+    createDatabaseFile(projectPath, databaseType);
+    createPackageJsonFile(projectName, projectPath, databaseType);
+    createDotEnvFile(projectPath, generalParams, dbParams, databaseType, isDev);
     createGitIgnoreFile(projectPath);
 
     models.forEach(model => {
-      createModelFile(projectPath, database, model);
+      createModelFile(projectPath, databaseType, model);
     });
 
-    createAmConfigFile(projectPath, database, models);
+    createAmConfigFile(projectPath, databaseType, models);
 
     resolve();
   });
 };
 
-const createDotEnvFile = (projectPath, generalParams, dbParams, database) => {
+const createDotEnvFile = (projectPath, generalParams, dbParams, database, isDev) => {
   const amDbUrl = database === 'mongodb' ?
     dbHelper.getMongodbConnectionUrl(dbParams) :
     dbHelper.getSQLConnectionUrl(database, dbParams);
@@ -66,7 +70,7 @@ const createDotEnvFile = (projectPath, generalParams, dbParams, database) => {
 
 AM_PROJECT_ID=${generalParams.id}
 AM_SECRET_KEY=${generalParams.sk}
-AM_AUTH_KEY=${generalHelper.randomString(64)}
+AM_AUTH_KEY=${isDev ? 'auth-key' : generalHelper.randomString(64)}
 AM_MASTER_PWD=${generalParams.master_password}
 AM_DB_URL=${amDbUrl}
 `;

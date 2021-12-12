@@ -8,7 +8,11 @@
     "adminmate": "index.js"
   },
   "scripts": {
-    "test": "jest --runInBand"
+    "test": "jest --runInBand",
+    "prepare-mongodb-env": "docker-compose -f test/envs/mongodb/docker-compose.yml up -d",
+    "prepare-mysql-env": "docker-compose -f test/envs/mysql/docker-compose.yml up -d",
+    "migrate-mongodb-data": "node test/envs/mongodb/migration.js",
+    "migrate-mysql-data": "node test/envs/mysql/migration.js"
   },
   "author": "Marc Delalonde",
   "homepage": "http://adminmate.io",
@@ -48,6 +52,7 @@
     "tedious": "^14.0.0"
   },
   "devDependencies": {
-    "@babel/plugin-transform-modules-commonjs": "^7.16.0"
+    "@babel/plugin-transform-modules-commonjs": "^7.16.0",
+    "faker": "^5.5.3"
   }
 }
