@@ -1,12 +1,13 @@
 import _ from 'lodash';
 import { MongoClient } from 'mongodb';
+import Sequelize from 'sequelize';
 import SequelizeAuto from 'sequelize-auto';
 import * as dataAnalyser from './dataAnalyser.js';
 import * as generalHelper from './general.js';
 
 const sequelizeDialects = {
   mysql: 'mysql',
-  postgressql: 'postgres',
+  postgresql: 'postgres',
   mariadb: 'mariadb',
   sqlite: 'sqlite',
   mssql: 'mssql'
@@ -144,13 +145,36 @@ const getMongodbSchemas = params => {
 const getSQLSchemas = (database, params) => {
   return new Promise(async (resolve, reject) => {
 
-    if (!params.host) { return reject('host parameter is undefined'); }
-    if (!params.name) { return reject('name parameter is undefined'); }
+    if (!params.host) {
+      return reject('host parameter is undefined');
+    }
+    if (!params.name) {
+      return reject('name parameter is undefined');
+    }
+    if (!sequelizeDialects[database]) {
+      return reject('undefined database dialect');
+    }
 
-    const auto = new SequelizeAuto(params.name, params.user, params.password, {
-      host: params.host,
-      port: params.port,
-      dialect: sequelizeDialects[database], // 'mysql' | 'mariadb' | 'sqlite' | 'postgres' | 'mssql',
+    const sqlConnectionUrl = getSQLConnectionUrl(database, params);
+    const sequelize = new Sequelize(sqlConnectionUrl);
+
+    // Try database connection
+    const reqCo = await sequelize.authenticate()
+      .then(() => {
+        return 'ok';
+      })
+      .catch(e => {
+        return null;
+      });
+
+    if (!reqCo) {
+      return reject('Please check your credentials');
+    }
+
+    const auto = new SequelizeAuto(sequelize, null, null, {
+      // host: params.host,
+      // port: params.port,
+      // dialect: sequelizeDialects[database], // 'mysql' | 'mariadb' | 'sqlite' | 'postgres' | 'mssql',
       // directory: './models-test', // where to write files
       noWrite: true,
       noInitModels: true,
@@ -172,12 +196,15 @@ const getSQLSchemas = (database, params) => {
 
     if (data && data.text) {
       Object.keys(data.text).forEach(tableName => {
-        if (tableName !== 'SequelizeMeta') {
-          cleanSchemas.push({
-            collection: tableName,
-            schema: data.text[tableName]
-          });
+        if (tableName === 'SequelizeMeta') {
+          return;
         }
+        // Remove dot for postgres table name "schema.table" => "schema_table"
+        const cleanTableName = tableName.replace(/\./g, '_');
+        cleanSchemas.push({
+          collection: cleanTableName,
+          schema: data.text[tableName]
+        });
       });
       // Order by model name
       cleanSchemas = _.orderBy(cleanSchemas, ['collection'], ['asc']);

@@ -123,6 +123,9 @@ const createPackageJsonFile = (projectPath, projectName, database) => {
   if (database === 'mysql') {
     extraPackages = `"mysql2": "^2.3.3"`;
   }
+  else if (database === 'postgresql') {
+    extraPackages = `"pg": "^8.7.1"`;
+  }
 
   const packageJson = `
 {

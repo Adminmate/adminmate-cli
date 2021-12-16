@@ -88,7 +88,7 @@ export default {
       name: 'port',
       type: 'input',
       message: 'Enter your PostgreSQL port',
-      default: 3306
+      default: 5432
     },
     {
       name: 'user',
