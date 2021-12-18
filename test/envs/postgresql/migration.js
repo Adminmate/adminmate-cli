@@ -33,6 +33,9 @@ connectDb().then(async () => {
   await models.User.bulkCreate(users)
     .catch(e => console.log('error', e));
 
+  await models.CustomUser.bulkCreate(users)
+    .catch(e => console.log('error', e));
+
   const usersList = await models.User.findAll({ where: {} })
     .catch(e => console.log('error', e));
   const usersIds = usersList.map(user => user.id);
@@ -53,12 +56,15 @@ connectDb().then(async () => {
         latitude: faker.address.latitude(),
         longitude: faker.address.longitude()
       },
-      ownerId: getRandom(usersIds)
+      userId: getRandom(usersIds)
     });
   }
 
   // Save rooms
   await models.Room.bulkCreate(rooms)
+    .catch(e => console.log('error', e));
+
+  await models.CustomRoom.bulkCreate(rooms)
     .catch(e => console.log('error', e));
 
   const roomsList = await models.Room.findAll({ where: {} })

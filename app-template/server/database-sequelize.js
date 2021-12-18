@@ -14,16 +14,9 @@ const sequelize = new Sequelize(process.env.AM_DB_URL, {
 });
 
 const db = {};
-
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-const normalizedPath = require('path').join(__dirname, 'models');
-
-const models = {};
-require('fs').readdirSync(normalizedPath).forEach(file => {
-  const modelName = file.replace('.js', '');
-  models[modelName] = require(`./models/${file}`)(sequelize, Sequelize);
-});
+const models = require('./models/init-models')(sequelize);
 
 module.exports = { models, db };

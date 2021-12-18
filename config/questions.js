@@ -108,6 +108,12 @@ export default {
       validate: value => {
         return value ? true : 'You have to set your database name';
       }
+    },
+    {
+      name: 'schema',
+      type: 'input',
+      message: 'Enter your PostgreSQL schema to look into',
+      default: 'public'
     }
   ],
   general: [

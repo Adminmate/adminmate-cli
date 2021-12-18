@@ -1,5 +1,5 @@
 export default (sequelize, Sequelize) => {
-  const Rooms = sequelize.define('rooms', {
+  const Rooms = sequelize.define('custom_rooms', {
     title: {
       type: Sequelize.STRING
     },
@@ -13,11 +13,12 @@ export default (sequelize, Sequelize) => {
       type: Sequelize.JSON
     }
   }, {
-    tableName: 'rooms'
+    tableName: 'custom_rooms',
+    schema: 'custom'
   });
 
   Rooms.associate = function(models) {
-    Rooms.belongsTo(models.User, {
+    Rooms.belongsTo(models.CustomUser, {
       foreignKey: 'userId',
       as: 'user'
     });

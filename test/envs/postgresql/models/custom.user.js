@@ -1,5 +1,5 @@
 export default (sequelize, Sequelize) => {
-  const Users = sequelize.define('users', {
+  const Users = sequelize.define('custom_users', {
     firstname: {
       type: Sequelize.STRING
     },
@@ -16,11 +16,12 @@ export default (sequelize, Sequelize) => {
       type: Sequelize.INTEGER
     }
   }, {
-    tableName: 'users'
+    tableName: 'custom_users',
+    schema: 'custom'
   });
 
   Users.associate = function(models) {
-    Users.hasMany(models.Room, {
+    Users.hasMany(models.CustomRoom, {
       foreignKey: 'userId',
       as: 'rooms'
     });

@@ -175,9 +175,10 @@ const getSQLSchemas = (database, params) => {
       // host: params.host,
       // port: params.port,
       // dialect: sequelizeDialects[database], // 'mysql' | 'mariadb' | 'sqlite' | 'postgres' | 'mssql',
-      // directory: './models-test', // where to write files
-      noWrite: true,
-      noInitModels: true,
+      directory: './models-tmp', // where to write files
+      // noWrite: true,
+      // noInitModels: true,
+      schema: params.schema,
       additional: {
         timestamps: false
       }
@@ -199,8 +200,8 @@ const getSQLSchemas = (database, params) => {
         if (tableName === 'SequelizeMeta') {
           return;
         }
-        // Remove dot for postgres table name "schema.table" => "schema_table"
-        const cleanTableName = tableName.replace(/\./g, '_');
+        // Remove schema name from table name "schema.table" => "table"
+        const cleanTableName = tableName.substring(tableName.indexOf('.') + 1)
         cleanSchemas.push({
           collection: cleanTableName,
           schema: data.text[tableName]
