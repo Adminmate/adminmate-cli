@@ -21,11 +21,7 @@ const databasePackages = {
   mariadb: '"adminmate-express-sequelize": "^1.0.4"'
 };
 
-export async function createAdminTemplate(databaseType, models, generalParams, dbParams) {
-  return await createTemplateStructure(databaseType, models, generalParams, dbParams);
-};
-
-const createTemplateStructure = (databaseType, models, generalParams, dbParams) => {
+const createAdminTemplate = async (databaseType, models, generalParams, dbParams) => {
   return new Promise(async (resolve, reject) => {
     const projectName = generalParams.name;
     const cwd = process.cwd();
@@ -55,7 +51,7 @@ const createTemplateStructure = (databaseType, models, generalParams, dbParams) 
       createModelFile(projectPath, databaseType, model);
     });
 
-    createAmConfigFile(projectPath, databaseType, models);
+    createAmConfigFile(projectPath, models);
 
     resolve();
   });
@@ -87,7 +83,7 @@ const createGitIgnoreFile = (projectPath) => {
   createFile(`${projectPath}/.gitignore`, fileContent);
 };
 
-const createAmConfigFile = (projectPath, database, models) => {
+const createAmConfigFile = (projectPath, models) => {
   const tplContent = fs.readFileSync(`${appRoot.path}/app-template/server/config/adminmate.hbs`, 'utf8');
   const compiledTplContent = handlebars.compile(tplContent);
   const result = compiledTplContent({ models });
@@ -174,3 +170,5 @@ const createFile = (filePath, content) => {
 
   fs.writeFileSync(filePath, content);
 };
+
+module.exports.createAdminTemplate = createAdminTemplate;

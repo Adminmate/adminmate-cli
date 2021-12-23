@@ -13,7 +13,7 @@ const sequelizeDialects = {
   mssql: 'mssql'
 };
 
-export function getDatabaseSchemas(database, params) {
+const getDatabaseSchemas = (database, params) => {
   if (database === 'mongodb') {
     return getMongodbSchemas(params);
   }
@@ -23,7 +23,7 @@ export function getDatabaseSchemas(database, params) {
   return Promise.reject('This database is not available for the moment');
 };
 
-export const getMongodbConnectionUrl = params => {
+const getMongodbConnectionUrl = params => {
   const protocol = `mongodb${params.srv ? '+srv' : ''}`;
   const cred = `${params.user}${params.user ? ':' : ''}${params.password}`;
   const host = `${params.host}${!params.srv ? `:${params.port}` : ''}`;
@@ -32,7 +32,7 @@ export const getMongodbConnectionUrl = params => {
   return uri;
 };
 
-export const getSQLConnectionUrl = (database, params) => {
+const getSQLConnectionUrl = (database, params) => {
   const protocol = sequelizeDialects[database];
   const cred = `${params.user}${params.user ? ':' : ''}${params.password}`;
   const host = `${params.host}:${params.port}`;
@@ -92,8 +92,12 @@ const getRelationships = datasets => {
 const getMongodbSchemas = params => {
   return new Promise(async (resolve, reject) => {
 
-    if (!params.host) { return reject('host parameter is undefined'); }
-    if (!params.name) { return reject('name parameter is undefined'); }
+    if (!params.host) {
+      return reject('host parameter is undefined');
+    }
+    if (!params.name) {
+      return reject('name parameter is undefined');
+    }
 
     await generalHelper.timeout(2000);
 
@@ -217,3 +221,7 @@ const getSQLSchemas = (database, params) => {
     resolve(cleanSchemas);
   });
 };
+
+module.exports.getDatabaseSchemas = getDatabaseSchemas;
+module.exports.getMongodbConnectionUrl = getMongodbConnectionUrl;
+module.exports.getSQLConnectionUrl = getSQLConnectionUrl;
