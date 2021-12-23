@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PostgreSQL to Sequelize schemas 1`] = `
+"const DataTypes = require(\\"sequelize\\").DataTypes;
+const _custom_rooms = require(\\"./custom_rooms\\");
+const _custom_users = require(\\"./custom_users\\");
+
+function initModels(sequelize) {
+  const custom_rooms = _custom_rooms(sequelize, DataTypes);
+  const custom_users = _custom_users(sequelize, DataTypes);
+
+  custom_rooms.belongsTo(custom_users, { as: \\"user\\", foreignKey: \\"userId\\"});
+  custom_users.hasMany(custom_rooms, { as: \\"custom_rooms\\", foreignKey: \\"userId\\"});
+
+  return {
+    custom_rooms,
+    custom_users,
+  };
+}
+module.exports = initModels;
+module.exports.initModels = initModels;
+module.exports.default = initModels;
+"
+`;

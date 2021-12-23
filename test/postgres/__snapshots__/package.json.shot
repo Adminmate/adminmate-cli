@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PostgreSQL to Sequelize schemas 1`] = `
+"
+{
+  \\"name\\": \\"test-postgresql-adminmate-postgresql\\",
+  \\"version\\": \\"1.0.0\\",
+  \\"private\\": true,
+  \\"scripts\\": {
+    \\"start\\": \\"node ./server.js\\"
+  },
+  \\"dependencies\\": {
+    \\"adminmate-express-sequelize\\": \\"^1.0.4\\",
+    \\"dotenv\\": \\"^10.0.0\\",
+    \\"express\\": \\"^4.16.4\\",
+    \\"pg\\": \\"^8.7.1\\"
+  }
+}"
+`;

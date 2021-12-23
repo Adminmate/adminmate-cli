@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MySQL to Sequelize schemas 1`] = `
+"const DataTypes = require(\\"sequelize\\").DataTypes;
+const _rooms = require(\\"./rooms\\");
+const _users = require(\\"./users\\");
+
+function initModels(sequelize) {
+  const rooms = _rooms(sequelize, DataTypes);
+  const users = _users(sequelize, DataTypes);
+
+  rooms.belongsTo(users, { as: \\"user\\", foreignKey: \\"userId\\"});
+  users.hasMany(rooms, { as: \\"rooms\\", foreignKey: \\"userId\\"});
+
+  return {
+    rooms,
+    users,
+  };
+}
+module.exports = initModels;
+module.exports.initModels = initModels;
+module.exports.default = initModels;
+"
+`;

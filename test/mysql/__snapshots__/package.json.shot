@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MySQL to Sequelize schemas 1`] = `
+"
+{
+  \\"name\\": \\"test-mysql-adminmate-mysql\\",
+  \\"version\\": \\"1.0.0\\",
+  \\"private\\": true,
+  \\"scripts\\": {
+    \\"start\\": \\"node ./server.js\\"
+  },
+  \\"dependencies\\": {
+    \\"adminmate-express-sequelize\\": \\"^1.0.4\\",
+    \\"dotenv\\": \\"^10.0.0\\",
+    \\"express\\": \\"^4.16.4\\",
+    \\"mysql2\\": \\"^2.3.3\\"
+  }
+}"
+`;

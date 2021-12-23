@@ -154,9 +154,12 @@ const getSQLSchemas = (database, params) => {
     if (!sequelizeDialects[database]) {
       return reject('undefined database dialect');
     }
+    if (database === 'postgresql' && !params.schema) {
+      return reject('database schema is mandatory for postgresql');
+    }
 
     const sqlConnectionUrl = getSQLConnectionUrl(database, params);
-    const sequelize = new Sequelize(sqlConnectionUrl);
+    const sequelize = new Sequelize(sqlConnectionUrl, { logging: false });
 
     // Try database connection
     const reqCo = await sequelize.authenticate()

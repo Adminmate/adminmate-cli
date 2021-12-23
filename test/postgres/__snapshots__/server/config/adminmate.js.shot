@@ -1,0 +1,38 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PostgreSQL to Sequelize schemas 1`] = `
+"// Get database instance
+const { models } = require('../database');
+
+module.exports = {
+
+  // Test
+  projectId: process.env.AM_PROJECT_ID,
+  secretKey: process.env.AM_SECRET_KEY,
+  authKey: process.env.AM_AUTH_KEY,
+  masterPassword: process.env.AM_MASTER_PWD,
+
+  models: [
+    {
+      slug: 'custom_rooms',
+      model: models.custom_rooms,
+      actions: [],
+      options: {
+        canUpdate: true,
+        canDelete: true
+      }
+    },
+    {
+      slug: 'custom_users',
+      model: models.custom_users,
+      actions: [],
+      options: {
+        canUpdate: true,
+        canDelete: true
+      }
+    },
+  ],
+
+  authorizedIps: []
+};"
+`;
