@@ -43,11 +43,18 @@ it('MySQL to Sequelize schemas', async () => {
 
   // Check generated project
   const arrayOfFiles = getAllFiles('../test-mysql-adminmate-api');
+
+  // Count number of files
+  expect(arrayOfFiles.length).toBe(9);
+
   arrayOfFiles.forEach(file => {
     const fileName = file.split('-adminmate-api/')[1];
     const fileContent = fs.readFileSync(file, 'utf8');
     expect(fileContent).toMatchSpecificSnapshot(`./mysql/__snapshots__/${fileName}.shot`);
   });
+
+  // Remove test directory
+  fs.rmdirSync('../test-mysql-adminmate-api', { recursive: true });
 });
 
 // End tests ----------------------------------------------------------------------------

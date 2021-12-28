@@ -48,11 +48,18 @@ it('MongoDB to Sequelize schemas', async () => {
 
   // Check generated project
   const arrayOfFiles = getAllFiles('../test-mongodb-adminmate-api');
+
+  // Count number of files
+  expect(arrayOfFiles.length).toBe(8);
+
   arrayOfFiles.forEach(file => {
     const fileName = file.split('-adminmate-api/')[1];
     const fileContent = fs.readFileSync(file, 'utf8');
     expect(fileContent).toMatchSpecificSnapshot(`./mongodb/__snapshots__/${fileName}.shot`);
   });
+
+  // Remove test directory
+  fs.rmdirSync('../test-mongodb-adminmate-api', { recursive: true });
 });
 
 // End tests ----------------------------------------------------------------------------
