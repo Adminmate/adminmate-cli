@@ -178,18 +178,22 @@ const getSQLSchemas = (database, params) => {
       return reject('Please check your credentials');
     }
 
-    const auto = new SequelizeAuto(sequelize, null, null, {
-      // host: params.host,
-      // port: params.port,
-      // dialect: sequelizeDialects[database], // 'mysql' | 'mariadb' | 'sqlite' | 'postgres' | 'mssql',
+    const sequelizeAutoOptions = {
       directory: './models-tmp', // where to write files
       // noWrite: true,
       // noInitModels: true,
-      schema: params.schema,
       additional: {
         timestamps: false
       }
-    });
+    };
+
+    // Add schema for postgreSQL
+    if (database === 'postgresql') {
+      sequelizeAutoOptions.schema = params.schema;
+    }
+
+    // Connect with SequelizeAuto
+    const auto = new SequelizeAuto(sequelize, null, null, sequelizeAutoOptions);
 
     let cleanSchemas = [];
 

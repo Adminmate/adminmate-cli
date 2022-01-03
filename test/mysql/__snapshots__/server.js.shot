@@ -22,7 +22,7 @@ app.use(express.urlencoded({
 }));
 
 // Connect to database
-const { db } = require('./server/database');
+const { db } = require('./database');
 db.sequelize.sync().then(() => {
   console.log('Adminmate Admin has started');
   console.log(\`Env: \${global.NODE_ENV}\`);
@@ -30,7 +30,7 @@ db.sequelize.sync().then(() => {
 
 // Add Adminmate
 const Adminmate = require('adminmate-express-sequelize');
-app.use(Adminmate.init(require('./server/config/adminmate')));
+app.use(Adminmate.init(require('./config/adminmate')));
 
 // Handle error 404 page
 app.use((req, res) => {

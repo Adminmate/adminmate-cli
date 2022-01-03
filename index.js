@@ -89,7 +89,7 @@ const commandLine = () => {
 
       // Check request validity ---------------------------------------------------------
 
-      spinnies.add('spinner-req-validity', { text: 'Checking request validity...' });
+      spinnies.add('spinner-req-validity', { text: 'Checking request validity...', color: 'white', succeedColor: 'white' });
       const authReq = await checkReqValidity(params).catch(() => {})
 
       if (!authReq) {
@@ -119,7 +119,7 @@ const commandLine = () => {
 
       const databaseCredentials = await inquirer.prompt(getDatabaseCredentialsQuestions(params.db));
 
-      spinnies.add('spinner-connecting', { text: 'Connecting to the database...' });
+      spinnies.add('spinner-connecting', { text: 'Connecting to the database...', color: 'white', succeedColor: 'white' });
 
       await generalHelper.timeout(1000);
 
@@ -150,7 +150,7 @@ const commandLine = () => {
 
       // Generate project template ------------------------------------------------------
 
-      spinnies.add('spinner-generating', { text: 'Generating the project structure...' });
+      spinnies.add('spinner-generating', { text: 'Generating the project structure...', color: 'white', succeedColor: 'white' });
 
       await generalHelper.timeout(2000);
       templateGenerator.createAdminTemplate(params.db, schemas, projectConfig, databaseCredentials);
