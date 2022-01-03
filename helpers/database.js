@@ -1,9 +1,9 @@
-import _ from 'lodash';
-import { MongoClient } from 'mongodb';
-import Sequelize from 'sequelize';
-import SequelizeAuto from 'sequelize-auto';
-import * as dataAnalyser from './dataAnalyser.js';
-import * as generalHelper from './general.js';
+const _ = require('lodash');
+const { MongoClient } = require('mongodb');
+const Sequelize = require('sequelize');
+const SequelizeAuto = require('sequelize-auto');
+const dataAnalyser = require('./dataAnalyser.js');
+const generalHelper = require('./general.js');
 
 const sequelizeDialects = {
   mysql: 'mysql',

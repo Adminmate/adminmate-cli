@@ -1,10 +1,10 @@
-import _ from 'lodash';
-import moment from 'moment';
+const _ = require('lodash');
+const moment = require('moment');
 
 let _dataStructure = {};
 let _finalDataStructure = {};
 
-export function analyse(dataSet, relationships) {
+const analyse = (dataSet, relationships) => {
   if (!Array.isArray(dataSet)) {
     return 'Should be an array';
   }
@@ -18,7 +18,7 @@ export function analyse(dataSet, relationships) {
   const cleanDataSetStructure = cleanDataStructure(dataSetStructure, cleanDataSet.length, relationships);
 
   return cleanDataSetStructure;
-}
+};
 
 // Data analyser ------------------------------------------------------------------------
 
@@ -123,3 +123,5 @@ const cleanDataStructureRecursive = (obj, cursor = '', dataSetLength, relationsh
     }
   });
 };
+
+module.exports.analyse = analyse;

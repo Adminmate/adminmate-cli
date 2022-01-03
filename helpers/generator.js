@@ -1,11 +1,11 @@
-import fs from 'fs';
-import mkdirp from 'mkdirp';
-import slugify from 'slugify';
-import appRoot from 'app-root-path';
+const fs = require('fs');
+const mkdirp = require('mkdirp');
+const slugify = require('slugify');
+const appRoot = require('app-root-path');
 
-import handlebars from './handlebars.js';
-import * as generalHelper from './general.js';
-import * as dbHelper from './database.js';
+const handlebars = require('./handlebars.js');
+const generalHelper = require('./general.js');
+const dbHelper = require('./database.js');
 
 const databaseTemplates = {
   mongodb: 'mongoose',

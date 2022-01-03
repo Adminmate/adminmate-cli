@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   database: {
     name: 'database',
     type: 'list',

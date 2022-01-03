@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 
-import commander from 'commander';
-import inquirer from 'inquirer';
-import figlet from 'figlet';
-import ora from 'ora';
-import axios from 'axios';
+const commander = require('commander');
+const inquirer = require('inquirer');
+const figlet = require('figlet');
+const Spinnies = require('spinnies');
+const axios = require('axios');
 
-import questions from './config/questions.js';
-import * as templateGenerator from './helpers/generator.js';
-import * as dbHelper from './helpers/database.js';
-import * as generalHelper from './helpers/general.js';
+const questions = require('./config/questions.js');
+const templateGenerator = require('./helpers/generator.js');
+const dbHelper = require('./helpers/database.js');
+const generalHelper = require('./helpers/general.js');
 
 // Reset console.log
 console.log = () => {};
@@ -81,20 +81,24 @@ const commandLine = () => {
     .requiredOption('--hash <hash>', 'use hash')
     .option('--db <database>', 'use database')
     .action(async (params, options) => {
+
+      // Init spinnies
+      const spinnies = new Spinnies();
+
       // console.log(params);
 
       // Check request validity ---------------------------------------------------------
 
-      const spinnerReqValidity = ora('Checking request validity...').start();
+      spinnies.add('spinner-req-validity', { text: 'Checking request validity...' });
       const authReq = await checkReqValidity(params).catch(() => {})
 
       if (!authReq) {
-        spinnerReqValidity.fail('Your cli request is invalid')
+        spinnies.fail('spinner-req-validity', { text: 'Your cli request is invalid' });
         return;
       }
 
       await validateStep(params, 'launch_cli');
-      spinnerReqValidity.succeed('');
+      spinnies.succeed('spinner-req-validity');
 
       // Check missing params -----------------------------------------------------------
 
@@ -115,13 +119,15 @@ const commandLine = () => {
 
       const databaseCredentials = await inquirer.prompt(getDatabaseCredentialsQuestions(params.db));
 
-      const spinner = ora('Connecting to the database...').start();
+      spinnies.add('spinner-connecting', { text: 'Connecting to the database...' });
+
+      await generalHelper.timeout(1000);
 
       // Connect to the database --------------------------------------------------------
 
       const schemas = await dbHelper.getDatabaseSchemas(params.db, databaseCredentials)
         .catch(err => {
-          spinner.fail(`Fail to connect to the database: ${err}`);
+          spinnies.fail('spinner-connecting', { text: `Failed to connect to the database: ${err}` });
         });
 
       if (!schemas) {
@@ -129,12 +135,12 @@ const commandLine = () => {
       }
 
       if (schemas.length === 0) {
-        spinner.fail(`There is no collection in your ${params.db} database`);
+        spinnies.fail('spinner-connecting', { text: `There is no collection in your ${params.db} database` });
         return;
       }
 
       await validateStep(params, 'database');
-      spinner.succeed();
+      spinnies.succeed('spinner-connecting');
 
       // Ask for last details -----------------------------------------------------------
 
@@ -144,17 +150,21 @@ const commandLine = () => {
 
       // Generate project template ------------------------------------------------------
 
-      const generationSpinner = ora('Generating the project structure...').start();
+      spinnies.add('spinner-generating', { text: 'Generating the project structure...' });
 
       await generalHelper.timeout(2000);
       templateGenerator.createAdminTemplate(params.db, schemas, projectConfig, databaseCredentials);
 
-      generationSpinner.succeed();
+      spinnies.succeed('spinner-generating');
       await validateStep(params, 'generation');
 
+      // Success messages ---------------------------------------------------------------
+
       console.log('');
-      ora('Your project is ready!').succeed();
-      ora('You can now start your server with the following command: "npm start"').info();
+      spinnies.add('spinner-success-1', { text: 'Your project has been generated successfully!' });
+      spinnies.succeed('spinner-success-1');
+      spinnies.add('spinner-success-2', { text: 'You can now go to the proper directory and start your server with the following command: "npm start"' });
+      spinnies.succeed('spinner-success-2');
       console.log('');
     })
     .parse(process.argv);

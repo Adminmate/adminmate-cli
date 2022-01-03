@@ -1,8 +1,8 @@
-export function timeout(ms) {
+const timeout = ms => {
   return new Promise(resolve => setTimeout(resolve, ms));
-}
+};
 
-export function randomString(length, onlyDigit = false, onlyLowercase = false) {
+const randomString = (length, onlyDigit = false, onlyLowercase = false) => {
   const _digit = '0123456789';
   const _lowercase = '0123456789abcdefghiklmnopqrstuvwxyz';
   const _all = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz';
@@ -16,4 +16,7 @@ export function randomString(length, onlyDigit = false, onlyLowercase = false) {
   }
 
   return randomstring;
-}
+};
+
+module.exports.timeout = timeout;
+module.exports.randomString = randomString;

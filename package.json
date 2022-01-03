@@ -44,12 +44,12 @@
     "mongodb-schema": "^9.0.0",
     "mongoose": "^6.1.3",
     "mysql2": "^2.3.3",
-    "ora": "^6.0.1",
     "pg": "^8.7.1",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.12.0-alpha.1",
     "sequelize-auto": "^0.8.5",
     "slugify": "^1.6.0",
+    "spinnies": "^0.5.1",
     "sqlite3": "^5.0.2",
     "tedious": "^14.0.0"
   },
