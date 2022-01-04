@@ -2,6 +2,8 @@ const _ = require('lodash');
 const { MongoClient } = require('mongodb');
 const Sequelize = require('sequelize');
 const SequelizeAuto = require('sequelize-auto');
+const appRoot = require('app-root-path');
+
 const dataAnalyser = require('./dataAnalyser.js');
 const generalHelper = require('./general.js');
 
@@ -179,7 +181,7 @@ const getSQLSchemas = (database, params) => {
     }
 
     const sequelizeAutoOptions = {
-      directory: './models-tmp', // where to write files
+      directory: `${appRoot.path}/models-tmp`, // where to write files
       // noWrite: true,
       // noInitModels: true,
       additional: {
