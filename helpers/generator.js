@@ -27,7 +27,8 @@ const createAdminTemplate = async (databaseType, models, generalParams, dbParams
     const cwd = process.cwd();
     const isDev = cwd.endsWith('/adminmate-cli');
     const targetDir = isDev ? cwd.replace('/adminmate-cli', '') : cwd;
-    const projectPath = `${targetDir}/${slugify(projectName).toLocaleLowerCase()}-adminmate-api`;
+    const projectSlug = `${slugify(projectName).toLocaleLowerCase()}-adminmate-api`;
+    const projectPath = `${targetDir}/${projectSlug}`;
 
     // Remove generated dir - for dev only
     if (isDev) {
@@ -52,7 +53,7 @@ const createAdminTemplate = async (databaseType, models, generalParams, dbParams
 
     createAmConfigFile(projectPath, models);
 
-    resolve();
+    resolve(projectSlug);
   });
 };
 

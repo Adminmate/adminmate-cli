@@ -5,6 +5,7 @@ const inquirer = require('inquirer');
 const figlet = require('figlet');
 const Spinnies = require('spinnies');
 const axios = require('axios');
+const cliColor = require('cli-color');
 
 const questions = require('./config/questions.js');
 const templateGenerator = require('./helpers/generator.js');
@@ -72,6 +73,23 @@ const getDatabaseCredentialsQuestions = db => {
   }
 };
 
+const installBox = projectSlug => {
+  const spaces = [...Array(44-projectSlug.length).keys()].map(() => '').join(' ');
+
+  console.debug('');
+  console.debug('   ┌──────────────────────────────────────────────────────────────────────────┐');
+  console.debug('   │                                                                          │');
+  console.debug(`   │   1. Type the following commands to finalize the installation process:   │`);
+  console.debug('   │                                                                          │');
+  console.debug(`   │    - ${cliColor.cyan(`cd ${projectSlug}`)}${spaces}                      │`);
+  console.debug(`   │    - ${cliColor.cyan('npm i && npm start')}                                                  │`);
+  console.debug('   │                                                                          │');
+  console.debug('   │   2. Go back to the installation web app                                 │')
+  console.debug('   │                                                                          │');
+  console.debug('   └──────────────────────────────────────────────────────────────────────────┘');
+  console.debug('');
+};
+
 const commandLine = () => {
   commander
     .usage('[options] <file>')
@@ -84,8 +102,6 @@ const commandLine = () => {
 
       // Init spinnies
       const spinnies = new Spinnies();
-
-      // console.log(params);
 
       // Check request validity ---------------------------------------------------------
 
@@ -153,19 +169,19 @@ const commandLine = () => {
       spinnies.add('spinner-generating', { text: 'Generating the project structure...', color: 'white', succeedColor: 'white' });
 
       await generalHelper.timeout(2000);
-      templateGenerator.createAdminTemplate(params.db, schemas, projectConfig, databaseCredentials);
+      const directoryName = await templateGenerator.createAdminTemplate(params.db, schemas, projectConfig, databaseCredentials);
 
       spinnies.succeed('spinner-generating');
       await validateStep(params, 'generation');
 
       // Success messages ---------------------------------------------------------------
 
-      console.log('');
-      spinnies.add('spinner-success-1', { text: 'Your project has been generated successfully!' });
+      console.debug('');
+      spinnies.add('spinner-success-1', { text: 'Your project has been successfully generated!' });
       spinnies.succeed('spinner-success-1');
-      spinnies.add('spinner-success-2', { text: 'You can now go to the proper directory and start your server with the following command: "npm start"' });
-      spinnies.succeed('spinner-success-2');
-      console.log('');
+
+      // Final steps
+      installBox(directoryName);
     })
     .parse(process.argv);
 };

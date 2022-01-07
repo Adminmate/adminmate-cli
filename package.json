@@ -31,6 +31,7 @@
   "dependencies": {
     "app-root-path": "^3.0.0",
     "axios": "^0.21.4",
+    "cli-color": "^2.0.1",
     "commander": "^8.2.0",
     "figlet": "^1.5.2",
     "handlebars": "^4.7.7",
