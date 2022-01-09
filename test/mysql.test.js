@@ -9,11 +9,11 @@ const { getAllFiles } = require('./utils.js');
 const db = require('./mysql/database.js');
 
 beforeAll(async () => {
-  await db.connectDb()
-    .then(async () => {
-      await db.models.User.bulkCreate(require('./mysql/data/users.js'));
-      await db.models.Room.bulkCreate(require('./mysql/data/rooms.js'));
-    });
+  await db.connectDb().catch(e => {
+    console.log(e);
+  });
+  await db.models.User.bulkCreate(require('./mysql/data/users.js'));
+  await db.models.Room.bulkCreate(require('./mysql/data/rooms.js'));
 });
 
 // Tests --------------------------------------------------------------------------------

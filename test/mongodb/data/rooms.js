@@ -5,7 +5,12 @@ module.exports = [
     price: 125,
     thumbnail: 'https://thumbnail.url',
     address: {
-      street: 'Street'
+      street: 'Street',
+      city: 'City',
+      country: 'Country',
+      zipCode: 10000,
+      latitude: 1,
+      longitude: 1
     }
   }
 ];

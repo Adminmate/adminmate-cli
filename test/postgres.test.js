@@ -9,11 +9,11 @@ const { getAllFiles } = require('./utils.js');
 const db = require('./postgres/database.js');
 
 beforeAll(async () => {
-  await db.connectDb()
-    .then(async () => {
-      await db.models.CustomUser.bulkCreate(require('./postgres/data/custom.users.js'));
-      await db.models.CustomRoom.bulkCreate(require('./postgres/data/custom.rooms.js'));
-    });
+  await db.connectDb().catch(e => {
+    console.log(e);
+  });
+  await db.models.CustomUser.bulkCreate(require('./postgres/data/custom.users.js'));
+  await db.models.CustomRoom.bulkCreate(require('./postgres/data/custom.rooms.js'));
 });
 
 // Tests --------------------------------------------------------------------------------

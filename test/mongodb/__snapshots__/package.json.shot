@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`MongoDB to Sequelize schemas 1`] = `
+exports[`MongoDB to Mongoose schemas 1`] = `
 "
 {
   \\"name\\": \\"test-mongodb-adminmate-mongodb\\",
@@ -10,7 +10,7 @@ exports[`MongoDB to Sequelize schemas 1`] = `
     \\"start\\": \\"node ./server.js\\"
   },
   \\"dependencies\\": {
-    \\"adminmate-express-mongoose\\": \\"^1.2.6\\",
+    \\"adminmate-express-mongoose\\": \\"^1.2.7\\",
     \\"dotenv\\": \\"^10.0.0\\",
     \\"express\\": \\"^4.16.4\\"
     

@@ -15,10 +15,19 @@ const RoomSchema = new Schema({
     required: true
   },
   address: {
-    street: String,
-    city: String,
-    country: String,
-    zipCode: String,
+    street: {
+      type: String,
+      required: true
+    },
+    city: {
+      type: String,
+      required: true
+    },
+    country: {
+      type: String,
+      required: true
+    },
+    zipCode: Number,
     latitude: Number,
     longitude: Number
   },

@@ -7,21 +7,29 @@ const { getAllFiles } = require('./utils.js');
 const db = require('./mongodb/database.js');
 
 beforeAll(async () => {
-  await db.connectDb()
-    .then(async () => {
-      await db.models.User.insertMany(require('./mongodb/data/users.js'));
-      const usersDB = await db.models.User.findOne().lean();
-      const roomsList = require('./mongodb/data/rooms.js');
-      roomsList.forEach(room => {
-        room.userId = usersDB._id;
-      });
-      await db.models.Room.insertMany(roomsList);
-    });
+  await db.connectDb().catch(e => {
+    console.log(e);
+  });
+
+  // Delete all entries from models
+  await db.models.User.deleteMany({});
+  await db.models.Room.deleteMany({});
+
+  // Save users
+  await db.models.User.insertMany(require('./mongodb/data/users.js'));
+  const usersDB = await db.models.User.findOne().lean();
+  const roomsList = require('./mongodb/data/rooms.js');
+  roomsList.forEach(room => {
+    room.userId = usersDB._id;
+  });
+
+  // Save rooms
+  await db.models.Room.insertMany(roomsList);
 });
 
 // Tests --------------------------------------------------------------------------------
 
-it('MongoDB to Sequelize schemas', async () => {
+it('MongoDB to Mongoose schemas', async () => {
   const dbParams = {
     host: 'localhost',
     port: 27017,

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`MongoDB to Sequelize schemas 1`] = `
+exports[`MongoDB to Mongoose schemas 1`] = `
 "const mongoose = require('mongoose');
 
 const connectDb = () => {

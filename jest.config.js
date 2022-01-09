@@ -8,13 +8,13 @@ module.exports = {
       displayName: 'mysql',
       testMatch: ['<rootDir>/test/mysql.test.js']
     },
-    // {
-    //   displayName: 'sqlite',
-    //   testMatch: ['<rootDir>/test/sqlite.test.js']
-    // },
     {
       displayName: 'postgres',
       testMatch: ['<rootDir>/test/postgres.test.js']
-    }
+    },
+    // {
+    //   displayName: 'sqlite',
+    //   testMatch: ['<rootDir>/test/sqlite.test.js']
+    // }
   ]
 }
