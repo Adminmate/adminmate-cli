@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const _ = require('lodash');
 const commander = require('commander');
 const inquirer = require('inquirer');
 const figlet = require('figlet');
@@ -98,6 +99,12 @@ const commandLine = () => {
     .requiredOption('--sk <sk>', 'use secret key')
     .requiredOption('--hash <hash>', 'use hash')
     .option('--db <database>', 'use database')
+    .option('--host <host>', 'use host')
+    .option('--port <port>', 'use port')
+    .option('--user <user>', 'use user')
+    .option('--password <password>', 'use password')
+    .option('--dbname <dbname>', 'use dbname')
+    .option('--schema <schema>', 'use schema')
     .action(async (params, options) => {
 
       // Init spinnies
@@ -118,28 +125,24 @@ const commandLine = () => {
 
       // Check missing params -----------------------------------------------------------
 
-      const databaseQuestions = [];
+      // If the database is not setted we ask for it
       if (!params.db || !['mysql', 'postgresql', 'sqlite', 'mongodb'].includes(params.db)) {
-        databaseQuestions.push(questions.database);
-      }
-
-      // If there is missing info
-      if (databaseQuestions.length) {
-        const databaseData = await inquirer.prompt(databaseQuestions);
-        if (!params.db) {
-          params.db = databaseData.database;
-        }
+        const databaseData = await inquirer.prompt([questions.database]);
+        params.db = databaseData.database;
       }
 
       // Ask for the database creddentials ----------------------------------------------
 
-      const databaseCredentials = await inquirer.prompt(getDatabaseCredentialsQuestions(params.db));
-
-      spinnies.add('spinner-connecting', { text: 'Connecting to the database...', color: 'white', succeedColor: 'white' });
-
-      await generalHelper.timeout(1000);
+      // Ask for the mission credentials & connection infos
+      // Just ask for the missing infos thanks to the second parameter
+      const databaseQuestions = getDatabaseCredentialsQuestions(params.db);
+      const databaseExistingAnswers = _.omit(params, ['name', 'id', 'sk', 'hash', 'db']);
+      const databaseCredentials = await inquirer.prompt(databaseQuestions, databaseExistingAnswers);
 
       // Connect to the database --------------------------------------------------------
+
+      // Loading...
+      spinnies.add('spinner-connecting', { text: 'Connecting to the database...', color: 'white', succeedColor: 'white' });
 
       const schemas = await dbHelper.getDatabaseSchemas(params.db, databaseCredentials)
         .catch(err => {

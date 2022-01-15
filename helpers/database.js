@@ -29,7 +29,7 @@ const getMongodbConnectionUrl = params => {
   const protocol = `mongodb${params.srv ? '+srv' : ''}`;
   const cred = `${params.user}${params.user ? ':' : ''}${params.password}`;
   const host = `${params.host}${!params.srv ? `:${params.port}` : ''}`;
-  const dbAndParams = `${params.name}${params.ssl?'?ssl=true':''}`;
+  const dbAndParams = `${params.dbname}${params.ssl?'?ssl=true':''}`;
   const uri = `${protocol}://${cred}${cred ? '@' : ''}${host}/${dbAndParams}`;
   return uri;
 };
@@ -38,7 +38,7 @@ const getSQLConnectionUrl = (database, params) => {
   const protocol = sequelizeDialects[database];
   const cred = `${params.user}${params.user ? ':' : ''}${params.password}`;
   const host = `${params.host}:${params.port}`;
-  const uri = `${protocol}://${cred}${cred ? '@' : ''}${host}/${params.name}`;
+  const uri = `${protocol}://${cred}${cred ? '@' : ''}${host}/${params.dbname}`;
   return uri;
 };
 
@@ -97,8 +97,8 @@ const getMongodbSchemas = params => {
     if (!params.host) {
       return reject('host parameter is undefined');
     }
-    if (!params.name) {
-      return reject('name parameter is undefined');
+    if (!params.dbname) {
+      return reject('dbname parameter is undefined');
     }
 
     await generalHelper.timeout(2000);
@@ -117,7 +117,7 @@ const getMongodbSchemas = params => {
     }
 
     // Connect to the proper db
-    const db = client.db(params.name);
+    const db = client.db(params.dbname);
 
     const datasets = {};
     const collections = await db.listCollections().toArray();
@@ -154,8 +154,8 @@ const getSQLSchemas = (database, params) => {
     if (!params.host) {
       return reject('host parameter is undefined');
     }
-    if (!params.name) {
-      return reject('name parameter is undefined');
+    if (!params.dbname) {
+      return reject('dbname parameter is undefined');
     }
     if (!sequelizeDialects[database]) {
       return reject('undefined database dialect');
@@ -164,8 +164,20 @@ const getSQLSchemas = (database, params) => {
       return reject('database schema is mandatory for postgresql');
     }
 
+    // Remove the protocol from the host
+    if (params.host.indexOf('://') > -1) {
+      params.host = params.host.substring(params.host.indexOf('://') + 3);
+    }
+
     const sqlConnectionUrl = getSQLConnectionUrl(database, params);
-    const sequelize = new Sequelize(sqlConnectionUrl, { logging: false });
+    const sequelize = new Sequelize(sqlConnectionUrl, {
+      logging: false,
+      dialectOptions: {
+        statement_timeout: 10000,
+        query_timeout: 10000,
+        idle_in_transaction_session_timeout: 10000
+      }
+    });
 
     // Try database connection
     const reqCo = await sequelize.authenticate()

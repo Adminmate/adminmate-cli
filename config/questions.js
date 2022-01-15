@@ -30,7 +30,7 @@ module.exports = {
       message: 'Enter your MongoDB password'
     },
     {
-      name: 'name',
+      name: 'dbname',
       type: 'input',
       message: 'Enter your MongoDB database name',
       validate: value => {
@@ -60,7 +60,8 @@ module.exports = {
     {
       name: 'user',
       type: 'input',
-      message: 'Enter your MySQL username'
+      message: 'Enter your MySQL username',
+      default: 'root'
     },
     {
       name: 'password',
@@ -69,7 +70,7 @@ module.exports = {
       message: 'Enter your MySQL password'
     },
     {
-      name: 'name',
+      name: 'dbname',
       type: 'input',
       message: 'Enter your MySQL database name',
       validate: value => {
@@ -93,7 +94,8 @@ module.exports = {
     {
       name: 'user',
       type: 'input',
-      message: 'Enter your PostgreSQL username'
+      message: 'Enter your PostgreSQL username',
+      default: 'postgres'
     },
     {
       name: 'password',
@@ -102,7 +104,7 @@ module.exports = {
       message: 'Enter your PostgreSQL password'
     },
     {
-      name: 'name',
+      name: 'dbname',
       type: 'input',
       message: 'Enter your PostgreSQL database name',
       validate: value => {
