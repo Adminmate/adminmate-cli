@@ -27,7 +27,7 @@ const getDatabaseSchemas = (database, params) => {
 
 const getMongodbConnectionUrl = params => {
   const protocol = `mongodb${params.srv ? '+srv' : ''}`;
-  const cred = `${params.user}${params.user ? ':' : ''}${params.password}`;
+  const cred = `${params.user}${params.password ? ':' : ''}${params.password}`;
   const host = `${params.host}${!params.srv ? `:${params.port}` : ''}`;
   const dbAndParams = `${params.dbname}${params.ssl?'?ssl=true':''}`;
   const uri = `${protocol}://${cred}${cred ? '@' : ''}${host}/${dbAndParams}`;
@@ -36,7 +36,7 @@ const getMongodbConnectionUrl = params => {
 
 const getSQLConnectionUrl = (database, params) => {
   const protocol = sequelizeDialects[database];
-  const cred = `${params.user}${params.user ? ':' : ''}${params.password}`;
+  const cred = `${params.user}${params.password ? ':' : ''}${params.password}`;
   const host = `${params.host}:${params.port}`;
   const uri = `${protocol}://${cred}${cred ? '@' : ''}${host}/${params.dbname}`;
   return uri;

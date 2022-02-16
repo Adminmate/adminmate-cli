@@ -12,13 +12,10 @@ const questions = require('./config/questions.js');
 const templateGenerator = require('./helpers/generator.js');
 const dbHelper = require('./helpers/database.js');
 const generalHelper = require('./helpers/general.js');
+const config = require('./config/config');
 
 // Reset console.log
 console.log = () => {};
-
-const cwd = process.cwd();
-const IS_PROD = !cwd.endsWith('/adminmate-cli');
-const API_URL = IS_PROD ? 'https://api.adminmate.io' : 'http://localhost:3010';
 
 figlet('Adminmate', function(err, data) {
   console.log('');
@@ -33,7 +30,7 @@ const checkReqValidity = params => {
     await generalHelper.timeout(2000);
     axios({
       method: 'POST',
-      url: `${API_URL}/cli/check_auth`,
+      url: `${global.config.apiUrl}/cli/check_auth`,
       data: {
         project_id: params.id,
         cli_token: params.hash
@@ -51,7 +48,7 @@ const checkReqValidity = params => {
 const validateStep = (params, step) => {
   return axios({
     method: 'POST',
-    url: `${API_URL}/cli/validate_step`,
+    url: `${global.config.apiUrl}/cli/validate_step`,
     data: {
       project_id: params.id,
       cli_token: params.hash,
@@ -105,7 +102,14 @@ const commandLine = () => {
     .option('--password <password>', 'use password')
     .option('--dbname <dbname>', 'use dbname')
     .option('--schema <schema>', 'use schema')
+    .option('--env <env>', 'use env')
     .action(async (params, options) => {
+      const cwd = process.cwd();
+
+      // Set default env to production
+      global.env = params.env || 'production';
+      global.config = config(global.env) || config('production');
+      global.use_local_cli = !cwd.endsWith('/adminmate-cli');
 
       // Init spinnies
       const spinnies = new Spinnies();

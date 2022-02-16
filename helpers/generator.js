@@ -25,13 +25,12 @@ const createAdminTemplate = async (databaseType, models, generalParams, dbParams
   return new Promise(async (resolve, reject) => {
     const projectName = generalParams.name;
     const cwd = process.cwd();
-    const isDev = cwd.endsWith('/adminmate-cli');
-    const targetDir = isDev ? cwd.replace('/adminmate-cli', '') : cwd;
+    const targetDir = global.use_local_cli ? cwd.replace('/adminmate-cli', '') : cwd;
     const projectSlug = `${slugify(projectName).toLocaleLowerCase()}-adminmate-api`;
     const projectPath = `${targetDir}/${projectSlug}`;
 
     // Remove generated dir - for dev only
-    if (isDev) {
+    if (global.use_local_cli) {
       fs.rmdirSync(`${projectPath}`, { recursive: true });
     }
 
@@ -44,7 +43,7 @@ const createAdminTemplate = async (databaseType, models, generalParams, dbParams
     createServerJsFile(projectPath, databaseType);
     createDatabaseFile(projectPath, databaseType);
     createPackageJsonFile(projectPath, projectName, databaseType);
-    createDotEnvFile(projectPath, generalParams, dbParams, databaseType, isDev);
+    createDotEnvFile(projectPath, generalParams, dbParams, databaseType, global.use_local_cli);
     createGitIgnoreFile(projectPath);
 
     models.forEach(model => {
@@ -57,7 +56,7 @@ const createAdminTemplate = async (databaseType, models, generalParams, dbParams
   });
 };
 
-const createDotEnvFile = (projectPath, generalParams, dbParams, database, isDev) => {
+const createDotEnvFile = (projectPath, generalParams, dbParams, database, useLocalCli) => {
   const amDbUrl = database === 'mongodb' ?
     dbHelper.getMongodbConnectionUrl(dbParams) :
     dbHelper.getSQLConnectionUrl(database, dbParams);
@@ -66,7 +65,7 @@ const createDotEnvFile = (projectPath, generalParams, dbParams, database, isDev)
 
 AM_PROJECT_ID=${generalParams.id}
 AM_SECRET_KEY=${generalParams.sk}
-AM_AUTH_KEY=${isDev ? 'auth_key' : generalHelper.randomString(64)}
+AM_AUTH_KEY=${useLocalCli ? 'auth_key' : generalHelper.randomString(64)}
 AM_MASTER_PWD=${generalParams.master_password}
 AM_DB_URL=${amDbUrl}
 `;

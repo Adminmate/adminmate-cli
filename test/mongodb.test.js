@@ -35,7 +35,7 @@ it('MongoDB to Mongoose schemas', async () => {
     port: 27017,
     user: '',
     password: '',
-    name: 'demo',
+    dbname: 'demo',
     ssl: false,
     srv: false
   };

@@ -23,7 +23,7 @@ it('PostgreSQL to Sequelize schemas', async () => {
     host: 'localhost',
     user: 'demo',
     password: 'demo',
-    name: 'demo',
+    dbname: 'demo',
     port: 5432,
     schema: 'custom'
   };
