@@ -133,7 +133,7 @@ const createPackageJsonFile = (projectPath, projectName, database) => {
   "dependencies": {
     ${ormNpmPackage},
     "dotenv": "^10.0.0",
-    "express": "^4.16.4"${extraPackages ? ',' : ''}
+    "express": "~4.17.2"${extraPackages ? ',' : ''}
     ${extraPackages}
   }
 }`;

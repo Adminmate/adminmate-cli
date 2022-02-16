@@ -169,14 +169,20 @@ const getSQLSchemas = (database, params) => {
       params.host = params.host.substring(params.host.indexOf('://') + 3);
     }
 
+    const dialectOptions = {};
+    if (database === 'mysql' || database === 'mariadb') {
+      dialectOptions.connectTimeout = 10000;
+    }
+    else if (database === 'postgresql') {
+      dialectOptions.statement_timeout = 10000;
+      dialectOptions.query_timeout = 10000;
+      dialectOptions.idle_in_transaction_session_timeout = 10000;
+    }
+
     const sqlConnectionUrl = getSQLConnectionUrl(database, params);
     const sequelize = new Sequelize(sqlConnectionUrl, {
       logging: false,
-      dialectOptions: {
-        statement_timeout: 10000,
-        query_timeout: 10000,
-        idle_in_transaction_session_timeout: 10000
-      }
+      dialectOptions
     });
 
     // Try database connection

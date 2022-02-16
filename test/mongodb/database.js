@@ -3,8 +3,11 @@ const mongoose = require('mongoose');
 const User = require('./models/user');
 const Room = require('./models/room');
 
+const dbName = 'demo';
+const connectionUrl = 'mongodb://localhost:27017/demo';
+
 const connectDb = () => {
-  return mongoose.connect('mongodb://localhost:27017/demo', {
+  return mongoose.connect(connectionUrl, {
     useNewUrlParser: true,
     useUnifiedTopology: true
   });
@@ -16,4 +19,4 @@ const disconnectDb = () => {
 
 const models = { User, Room };
 
-module.exports = { models, connectDb, disconnectDb };
+module.exports = { models, connectDb, dbName, connectionUrl, disconnectDb };

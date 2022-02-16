@@ -27,6 +27,9 @@ it('MySQL to Sequelize schemas', async () => {
     port: 3306
   };
 
+  // Important
+  global.use_local_cli = true;
+
   const dialect = 'mysql';
 
   const schemas = await getDatabaseSchemas(dialect, dbParams);

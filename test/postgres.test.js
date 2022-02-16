@@ -28,6 +28,9 @@ it('PostgreSQL to Sequelize schemas', async () => {
     schema: 'custom'
   };
 
+  // Important
+  global.use_local_cli = true;
+
   const dialect = 'postgresql';
 
   const schemas = await getDatabaseSchemas(dialect, dbParams);

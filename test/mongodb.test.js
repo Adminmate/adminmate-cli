@@ -6,7 +6,35 @@ const { getAllFiles } = require('./utils.js');
 
 const db = require('./mongodb/database.js');
 
+const cleanDemoDatabase = () => {
+  return new Promise((resolve, reject) => {
+    const MongoClient = require('mongodb').MongoClient;
+    const dbName = db.dbName;
+    const client = new MongoClient(db.connectionUrl);
+
+    client
+      .connect()
+      .then(client => client.db(dbName).listCollections().toArray())
+      .then(async cols => {
+        // Drop all models
+        const _drops = await Promise.all(cols.map(col => {
+          return client.db(dbName).collection(col.name).drop();
+        }));
+
+        // Close connection
+        client.close();
+
+        // Resolve when cleaning is finished
+        resolve();
+      });
+  });
+};
+
 beforeAll(async () => {
+  // Clean demo database
+  await cleanDemoDatabase();
+
+  // Create demo models
   await db.connectDb().catch(e => {
     console.log(e);
   });
@@ -39,6 +67,9 @@ it('MongoDB to Mongoose schemas', async () => {
     ssl: false,
     srv: false
   };
+
+  // Important
+  global.use_local_cli = true;
 
   const dialect = 'mongodb';
 
