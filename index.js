@@ -109,7 +109,7 @@ const commandLine = () => {
       // Set default env to production
       global.env = params.env || 'production';
       global.config = config(global.env) || config('production');
-      global.use_local_cli = !cwd.endsWith('/adminmate-cli');
+      global.use_local_cli = cwd.endsWith('/adminmate-cli') === true;
 
       // Init spinnies
       const spinnies = new Spinnies();
