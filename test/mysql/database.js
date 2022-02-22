@@ -9,7 +9,13 @@ const Room = require('./models/room.js')(sequelize, Sequelize.DataTypes);
 const User = require('./models/user.js')(sequelize, Sequelize.DataTypes);
 
 const connectDb = async () => {
+  // Disable foreign keys check
+  await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
+  // Drop everything
   await sequelize.drop();
+  // Re-enable foreign keys check
+  await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
+  // Sync database
   return sequelize.sync({ force: true });
 };
 

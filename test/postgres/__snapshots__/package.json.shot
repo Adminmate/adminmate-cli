@@ -10,9 +10,9 @@ exports[`PostgreSQL to Sequelize schemas 1`] = `
     \\"start\\": \\"node ./server.js\\"
   },
   \\"dependencies\\": {
-    \\"adminmate-express-sequelize\\": \\"^1.0.5\\",
+    \\"adminmate-express-sequelize\\": \\"^1.1.0\\",
     \\"dotenv\\": \\"^10.0.0\\",
-    \\"express\\": \\"^4.16.4\\",
+    \\"express\\": \\"~4.17.2\\",
     \\"pg\\": \\"^8.7.1\\"
   }
 }"

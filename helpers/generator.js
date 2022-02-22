@@ -15,10 +15,10 @@ const databaseTemplates = {
 };
 
 const databasePackages = {
-  mongodb: '"adminmate-express-mongoose": "^1.2.7"',
-  mysql: '"adminmate-express-sequelize": "^1.0.5"',
-  postgresql: '"adminmate-express-sequelize": "^1.0.5"',
-  mariadb: '"adminmate-express-sequelize": "^1.0.5"'
+  mongodb: '"adminmate-express-mongoose": "^1.3.0"',
+  mysql: '"adminmate-express-sequelize": "^1.1.0"',
+  postgresql: '"adminmate-express-sequelize": "^1.1.0"',
+  mariadb: '"adminmate-express-sequelize": "^1.1.0"'
 };
 
 const createAdminTemplate = async (databaseType, models, generalParams, dbParams) => {
