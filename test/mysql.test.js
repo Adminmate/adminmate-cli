@@ -1,10 +1,15 @@
 // see https://stackoverflow.com/questions/46227783/encoding-not-recognized-in-jest-js
 require('mysql2/node_modules/iconv-lite').encodingExists('foo');
 require('jest-specific-snapshot');
+
+const path = require('path');
 const fs = require('fs');
 const { getDatabaseSchemas } = require('../helpers/database');
 const { createAdminTemplate } = require('../helpers/generator');
 const { getAllFiles } = require('./utils.js');
+
+// Make the appRoot path available everywhere
+global.appRoot = path.resolve(__dirname).replace('/test', '');
 
 const db = require('./mysql/database.js');
 
