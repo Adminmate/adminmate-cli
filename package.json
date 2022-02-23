@@ -34,6 +34,7 @@
     "cli-color": "^2.0.1",
     "commander": "^8.2.0",
     "figlet": "^1.5.2",
+    "global-modules-path": "^2.3.1",
     "handlebars": "^4.7.7",
     "inquirer": "^8.1.5",
     "jest": "^27.3.1",
