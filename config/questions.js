@@ -3,7 +3,7 @@ module.exports = {
     name: 'database',
     type: 'list',
     message: 'What kind of database you want to use ?',
-    choices: ['mysql', 'postgresql', 'sqlite', 'mongodb']
+    choices: ['mysql', 'postgresql', 'mongodb']
   },
   mongodb: [
     {

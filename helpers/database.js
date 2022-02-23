@@ -2,7 +2,6 @@ const _ = require('lodash');
 const { MongoClient } = require('mongodb');
 const Sequelize = require('sequelize');
 const SequelizeAuto = require('sequelize-auto');
-const appRoot = require('app-root-path');
 
 const dataAnalyser = require('./dataAnalyser.js');
 const generalHelper = require('./general.js');
@@ -11,8 +10,8 @@ const sequelizeDialects = {
   mysql: 'mysql',
   postgresql: 'postgres',
   mariadb: 'mariadb',
-  sqlite: 'sqlite',
-  mssql: 'mssql'
+  // sqlite: 'sqlite',
+  // mssql: 'mssql'
 };
 
 const getDatabaseSchemas = (database, params) => {
@@ -199,7 +198,7 @@ const getSQLSchemas = (database, params) => {
     }
 
     const sequelizeAutoOptions = {
-      directory: `${appRoot.path}/models-tmp`, // where to write files
+      directory: `${global.appRoot}/models-tmp`, // where to write files
       // noWrite: true,
       // noInitModels: true,
       additional: {

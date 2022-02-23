@@ -29,15 +29,12 @@
     "postgresql"
   ],
   "dependencies": {
-    "app-root-path": "^3.0.0",
-    "axios": "^0.21.4",
+    "axios": "^0.26.0",
     "cli-color": "^2.0.1",
     "commander": "^8.2.0",
     "figlet": "^1.5.2",
     "handlebars": "^4.7.7",
     "inquirer": "^8.1.5",
-    "jest": "^27.3.1",
-    "jest-specific-snapshot": "^5.0.0",
     "lodash": "^4.17.21",
     "mkdirp": "^1.0.4",
     "moment": "^2.29.1",
@@ -50,12 +47,12 @@
     "sequelize": "^6.13.0",
     "sequelize-auto": "^0.8.5",
     "slugify": "^1.6.0",
-    "spinnies": "^0.5.1",
-    "sqlite3": "^5.0.2",
-    "tedious": "^14.0.0"
+    "spinnies": "^0.5.1"
   },
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.16.0",
-    "faker": "^5.5.3"
+    "faker": "^5.5.3",
+    "jest": "^27.3.1",
+    "jest-specific-snapshot": "^5.0.0"
   }
 }

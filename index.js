@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const path = require('path');
 const _ = require('lodash');
 const commander = require('commander');
 const inquirer = require('inquirer');
@@ -13,6 +14,9 @@ const templateGenerator = require('./helpers/generator.js');
 const dbHelper = require('./helpers/database.js');
 const generalHelper = require('./helpers/general.js');
 const config = require('./config/config');
+
+// Make the appRoot path available everywhere
+global.appRoot = path.resolve(__dirname);
 
 // Reset console.log
 console.log = () => {};
@@ -66,8 +70,8 @@ const getDatabaseCredentialsQuestions = db => {
       return questions.mysql;
     case 'postgresql':
       return questions.postgresql;
-    case 'sqlite':
-      return [];
+    // case 'sqlite':
+    //   return [];
   }
 };
 
