@@ -7,7 +7,7 @@
     "adminmate": "index.js"
   },
   "scripts": {
-    "test": "jest --runInBand",
+    "test": "jest",
     "prepare-mongodb-env": "docker-compose -f test/envs/mongodb/docker-compose.yml up -d",
     "prepare-mysql-env": "docker-compose -f test/envs/mysql/docker-compose.yml up -d",
     "prepare-postgresql-env": "docker-compose -f test/envs/postgresql/docker-compose.yml up -d",
