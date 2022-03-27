@@ -10,7 +10,7 @@ exports[`MySQL to Sequelize schemas 1`] = `
     \\"start\\": \\"node ./server.js\\"
   },
   \\"dependencies\\": {
-    \\"adminmate-express-sequelize\\": \\"^1.1.1\\",
+    \\"adminmate-express-sequelize\\": \\"^1.1.2\\",
     \\"dotenv\\": \\"^10.0.0\\",
     \\"express\\": \\"~4.17.2\\",
     \\"mysql2\\": \\"^2.3.3\\"

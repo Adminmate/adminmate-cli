@@ -94,7 +94,19 @@ it('MongoDB to Mongoose schemas', async () => {
   const arrayOfFiles = getAllFiles('../test-mongodb-adminmate-api');
 
   // Count number of files
-  expect(arrayOfFiles.length).toBe(8);
+  const cleanFiles = arrayOfFiles.map(file => {
+    return file.split('test-mongodb-adminmate-api/')[1]
+  });
+  expect(cleanFiles).toEqual([
+    '.env',
+    '.gitignore',
+    'config/adminmate.js',
+    'database.js',
+    'models/rooms.js',
+    'models/users.js',
+    'package.json',
+    'server.js'
+  ]);
 
   arrayOfFiles.forEach(file => {
     const fileName = file.split('-adminmate-api/')[1];

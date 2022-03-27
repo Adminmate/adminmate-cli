@@ -53,7 +53,20 @@ it('MySQL to Sequelize schemas', async () => {
   const arrayOfFiles = getAllFiles('../test-mysql-adminmate-api');
 
   // Count number of files
-  expect(arrayOfFiles.length).toBe(9);
+  const cleanFiles = arrayOfFiles.map(file => {
+    return file.split('test-mysql-adminmate-api/')[1]
+  });
+  expect(cleanFiles).toEqual([
+    '.env',
+    '.gitignore',
+    'config/adminmate.js',
+    'database.js',
+    'models/init-models.js',
+    'models/rooms.js',
+    'models/users.js',
+    'package.json',
+    'server.js'
+  ]);
 
   arrayOfFiles.forEach(file => {
     const fileName = file.split('-adminmate-api/')[1];

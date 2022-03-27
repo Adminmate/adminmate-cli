@@ -54,7 +54,20 @@ it('PostgreSQL to Sequelize schemas', async () => {
   const arrayOfFiles = getAllFiles('../test-postgresql-adminmate-api');
 
   // Count number of files
-  expect(arrayOfFiles.length).toBe(9);
+  const cleanFiles = arrayOfFiles.map(file => {
+    return file.split('test-postgresql-adminmate-api/')[1]
+  });
+  expect(cleanFiles).toEqual([
+    '.env',
+    '.gitignore',
+    'config/adminmate.js',
+    'database.js',
+    'models/custom_rooms.js',
+    'models/custom_users.js',
+    'models/init-models.js',
+    'package.json',
+    'server.js'
+  ]);
 
   arrayOfFiles.forEach(file => {
     const fileName = file.split('-adminmate-api/')[1];
