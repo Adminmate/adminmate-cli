@@ -171,7 +171,12 @@ const commandLine = () => {
 
       // Ask for last details -----------------------------------------------------------
 
-      const projectDetails = await inquirer.prompt(questions.general);
+      const generalAnswers = {};
+      if (global.env === 'development') {
+        generalAnswers.master_password = 'master_password';
+      }
+
+      const projectDetails = await inquirer.prompt(questions.general, generalAnswers);
       const projectConfig = { ...params, ...projectDetails };
       await validateStep(params, 'master_password');
 
