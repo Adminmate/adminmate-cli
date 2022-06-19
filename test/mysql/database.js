@@ -11,6 +11,8 @@ const User = require('./models/user.js')(sequelize, Sequelize.DataTypes);
 const connectDb = async () => {
   // Disable foreign keys check
   await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
+  // Force the drop of the cars model (from others tests)
+  await sequelize.query('DROP TABLE IF EXISTS cars;');
   // Drop everything
   await sequelize.drop();
   // Re-enable foreign keys check

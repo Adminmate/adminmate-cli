@@ -12,14 +12,14 @@ const CustomUser = require('./models/custom.user.js')(sequelize, Sequelize.DataT
 
 const connectDb = async () => {
   // Disable foreign keys check
-  await sequelize.query(`SET session_replication_role = 'replica'`);
+  // await sequelize.query(`SET session_replication_role = 'replica'`);
   // Drop everything
-  await sequelize.drop();
+  // await sequelize.drop();
   // Re-enable foreign keys check
-  await sequelize.query(`SET session_replication_role = 'origin'`);
+  // await sequelize.query(`SET session_replication_role = 'origin'`);
 
   // Create the custom schema and the whole database
-  await sequelize.createSchema('custom');
+  await sequelize.createSchema('custom').catch(e => {});
   return sequelize.sync({ force: true });
 };
 

@@ -173,7 +173,7 @@ const commandLine = () => {
 
       const generalAnswers = {};
       if (global.env === 'development') {
-        generalAnswers.master_password = 'master_password';
+        generalAnswers.master_password = 'master';
       }
 
       const projectDetails = await inquirer.prompt(questions.general, generalAnswers);

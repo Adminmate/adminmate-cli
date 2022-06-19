@@ -2,7 +2,7 @@
 
 exports[`MongoDB to Mongoose schemas 1`] = `
 "// Import all env vars from .env file
-require('dotenv').config({ path: `${__dirname}/.env` });
+require('dotenv').config({ path: \`\${__dirname}/.env\` });
 const express = require('express');
 
 // Environment vars
