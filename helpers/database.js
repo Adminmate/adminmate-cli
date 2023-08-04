@@ -2,13 +2,14 @@ const _ = require('lodash');
 const { MongoClient } = require('mongodb');
 const Sequelize = require('sequelize');
 const SequelizeAuto = require('sequelize-auto');
+// const fs = require('fs');
 
 const dataAnalyser = require('./dataAnalyser.js');
 const generalHelper = require('./general.js');
 
 const sequelizeDialects = {
   mysql: 'mysql',
-  postgresql: 'postgres',
+  postgresql: 'postgresql',
   mariadb: 'mariadb',
   // sqlite: 'sqlite',
   // mssql: 'mssql'
@@ -29,7 +30,7 @@ const getMongodbConnectionUrl = params => {
   const cred = `${params.user}${params.password ? ':' : ''}${params.password}`;
   const host = `${params.host}${!params.srv ? `:${params.port}` : ''}`;
   const dbAndParams = `${params.dbname}${params.ssl?'?ssl=true':''}`;
-  const uri = `${protocol}://${cred}${cred ? '@' : ''}${host}/${dbAndParams}`;
+  const uri = `${protocol}://${cred}${cred ? '@' : ''}${host}/${dbAndParams}?authSource=admin`;
   return uri;
 };
 
@@ -176,6 +177,11 @@ const getSQLSchemas = (database, params) => {
       dialectOptions.statement_timeout = 10000;
       dialectOptions.query_timeout = 10000;
       dialectOptions.idle_in_transaction_session_timeout = 10000;
+
+      // dialectOptions.ssl = {
+      //   rejectUnauthorized: false,
+      //   ca: fs.readFileSync('./ca-certificate.crt').toString(),
+      // };
     }
 
     const sqlConnectionUrl = getSQLConnectionUrl(database, params);

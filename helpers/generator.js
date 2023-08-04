@@ -31,10 +31,11 @@ const createAdminTemplate = async (databaseType, models, generalParams, dbParams
 
     // Remove generated dir - for dev only
     if (global.use_local_cli) {
-      fs.rmdirSync(`${projectPath}`, { recursive: true });
+      fs.rmSync(`${projectPath}`, { recursive: true, force: true });
     }
 
     // Create directories
+    mkdirp.sync(projectPath);
     mkdirp.sync(`${projectPath}/config`);
     mkdirp.sync(`${projectPath}/controllers`);
     mkdirp.sync(`${projectPath}/middlewares`);
