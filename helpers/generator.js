@@ -59,7 +59,7 @@ const createAdminTemplate = async (databaseType, models, generalParams, dbParams
 
 const createDotEnvFile = (projectPath, generalParams, dbParams, database, useLocalCli) => {
   const amDbUrl = database === 'mongodb' ?
-    dbHelper.getMongodbConnectionUrl(dbParams) :
+    dbParams.connection_method == "connection string" ? dbParams.connection_string : dbHelper.getMongodbConnectionUrl(dbParams) :
     dbHelper.getSQLConnectionUrl(database, dbParams);
 
   const fileContent = `// IMPORTANT: This file should be removed from production env

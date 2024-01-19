@@ -141,11 +141,39 @@ const commandLine = () => {
 
       // Ask for the database creddentials ----------------------------------------------
 
-      // Ask for the mission credentials & connection infos
-      // Just ask for the missing infos thanks to the second parameter
-      const databaseQuestions = getDatabaseCredentialsQuestions(params.db);
-      const databaseExistingAnswers = _.omit(params, ['name', 'id', 'sk', 'hash', 'db']);
-      const databaseCredentials = await inquirer.prompt(databaseQuestions, databaseExistingAnswers);
+      let databaseCredentials = {};
+
+      const isMongodb = params.db === 'mongodb';
+      if(isMongodb) {
+        const connectionMethod = await inquirer.prompt([{
+            name: 'connection_method',
+            type: 'list',
+            message: 'How do you want to connect? ',
+            choices: ['connection string', 'parameters (host, port, user, password, database name)']
+        }]);
+        databaseCredentials.connection_method = connectionMethod.connection_method;   
+      }
+
+      if(isMongodb && databaseCredentials.connection_method !== 'connection string'){
+        // Ask for the mission credentials & connection infos
+        // Just ask for the missing infos thanks to the second parameter
+        const databaseQuestions = getDatabaseCredentialsQuestions(params.db);
+        const databaseExistingAnswers = _.omit(params, ['name', 'id', 'sk', 'hash', 'db']);
+        databaseCredentials = await inquirer.prompt(databaseQuestions, databaseExistingAnswers);
+      }else{
+        const databaseConnectionString = await inquirer.prompt([
+          {
+            name: 'connection_string',
+            type: 'input',
+            message: 'Enter your MongoDB connection string',
+            validate: value => {
+              return value ? true : 'You have to set your connection string';
+            }
+          }
+        ]);
+        databaseCredentials.connection_string = databaseConnectionString.connection_string;
+        databaseCredentials.dbname = databaseConnectionString.dbname;
+      }
 
       // Connect to the database --------------------------------------------------------
 
