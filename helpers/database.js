@@ -91,20 +91,20 @@ const getRelationships = datasets => {
   return relationships;
 };
 
-const getMongodbSchemas = params => {
+const getMongodbSchemas = (params) => {
   return new Promise(async (resolve, reject) => {
 
-    if (!params.host) {
+    if (params.connection_method !== 'connection string' && !params.host) {
       return reject('host parameter is undefined');
     }
-    if (!params.dbname) {
+    if (params.connection_method !== 'connection string' && !params.dbname) {
       return reject('dbname parameter is undefined');
     }
 
     await generalHelper.timeout(2000);
 
     // Get mongodb connection url
-    const uri = getMongodbConnectionUrl(params);
+    const uri = params.connection_method == 'connection string' ? params.connection_string : getMongodbConnectionUrl(params);
 
     const client = await MongoClient.connect(uri, { useNewUrlParser: true })
       .catch(err => {
@@ -112,12 +112,13 @@ const getMongodbSchemas = params => {
         return null;
       });
 
+
     if (!client) {
       return;
     }
 
     // Connect to the proper db
-    const db = client.db(params.dbname);
+    const db = client.db(client.options.dbName);
 
     const datasets = {};
     const collections = await db.listCollections().toArray();
